@@ -1,0 +1,36 @@
+#!/usr/bin/env zsh
+
+tag-to-index () {
+  [[ $1 -eq 0 ]] && echo 9 || echo $(($1 - 1))
+}
+
+action () {
+  herbstclient ${1}_index $(tag-to-index $2)
+}
+
+both () {
+  action move $1
+  action use $1
+}
+
+tags=$(herbstclient tag_status)
+tags=${(z)tags}
+tags="${tags[*]}"
+
+while [[ ${tags:0:1} != '#' ]]; do
+  tags=${(z)tags}
+  tags=(${tags:1} ${tags:0:1})
+  tags="${tags[*]}"
+done
+
+tags=${(z)tags}
+tags=(${tags:1})
+
+for tag in $tags; do
+  if ([[ $2 == 'free' ]]     && [[ ${tag:0:1} == '.' ]]) || \
+     ([[ $2 == 'occupied' ]] && [[ ${tag:0:1} == ':' ]]); then
+    tag=${tag:1:2}
+    [[ $1 == 'both' ]] && both $tag || action $1 $tag
+    break
+  fi
+done
