@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+interval='1200s'
+shuffle=1
+
+path="$HOME/pics/walls"
+active_path="$path/active"
+
+case "$1" in
+  ?)
+    echo $path
+    ;;
+esac
