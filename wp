@@ -7,7 +7,7 @@ path="$HOME/pics/walls"
 active_path="$path/active"
 
 case "$1" in
-  ?)
+  '?')
     echo $path
     ;;
 esac
