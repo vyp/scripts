@@ -12,6 +12,12 @@ case "$1" in
   '?')
     echo $path
     ;;
+  '=')
+    echo set
+    ;;
+  -+([a-z]))
+    echo option
+    ;;
   '_')
     echo daemon
     ;;
@@ -23,9 +29,6 @@ case "$1" in
     ;;
   '-')
     echo remove
-    ;;
-  -+([a-z]))
-    echo option
     ;;
   *)
     echo add
