@@ -1,5 +1,19 @@
 #!/usr/bin/env zsh
 
+start-slideshow () {
+  while :; do
+    sleep $interval
+    # next
+  done
+}
+
+stop-slideshow () {
+  if [[ -n $REPLY ]]; then
+    kill $REPLY
+    REPLY=''
+  fi
+}
+
 subdirs () {
   local filename=$(basename "$1")
   local subdirs=${1#$walls/}
@@ -36,18 +50,10 @@ activate () {
   done
 }
 
-start-slideshow () {
-  while :; do
-    sleep $interval
-    # next
+deactivate () {
+  for file in $@; do
+    echo $file
   done
-}
-
-stop-slideshow () {
-  if [[ -n $REPLY ]]; then
-    kill $REPLY
-    REPLY=''
-  fi
 }
 
 main () {
@@ -101,7 +107,7 @@ main () {
         fi
         ;;
       '!')
-        echo remove
+        deactivate $args
         ;;
       *)
         [[ -z $args ]] && activate $walls || activate $args
