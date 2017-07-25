@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+# Symlinks arguments to active directory. Directories are recursively expanded
+# to their contents.
 activate () {
   for file in $@; do
     if [[ ${file:0:1} != '/' ]]; then
@@ -10,7 +12,16 @@ activate () {
       # `(N)' skips empty directories.
       [[ "$file" != "$walls/$active_dirname" ]] && activate $file/*(N)
     else
-      echo "$file"
+      if [[ ${#filetypes[@]} -eq 0 ]]; then
+        echo "$file"
+      else
+        for filetype in $filetypes; do
+          if [[ "$file" == *.$filetype ]]; then
+            echo "$file"
+	    break
+          fi
+        done
+      fi
     fi
   done
 }
