@@ -1,3 +1,0 @@
-#compdef wp
-
-_files -W $(wp \?)

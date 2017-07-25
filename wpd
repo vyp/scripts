@@ -1,0 +1,71 @@
+#!/usr/bin/env zsh
+
+[[ -p /tmp/wpd ]] \
+  || ([[ -f /tmp/wpd ]] && exit 1 || mkfifo /tmp/wpd)
+
+. ~/env/bin/wpd
+local -a current_wall
+mkdir -p "$walls/$active_dirname"
+
+start-slideshow () {
+  while :; do
+    sleep $interval
+    # next
+  done
+}
+
+stop-slideshow () {
+  if [[ -n $REPLY ]]; then
+    kill $REPLY
+    REPLY=''
+  fi
+}
+
+while :; do
+  cmd=$(</tmp/wpd)
+  cmd=${(z)cmd}
+
+  case "${cmd:0:1}" in
+    '=')
+      echo set
+      ;;
+    '_')
+      [[ $shuffle -eq 0 ]] && shuffle=1 || shuffle=0
+      echo $shuffle
+      ;;
+    '+')
+      if [[ -n ${cmd:1:2} ]]; then
+        if [[ ${cmd:1:2} -eq 0 ]]; then
+          stop-slideshow
+        else
+          stop-slideshow
+          interval=${cmd:1:2}
+          read < <(start-slideshow & echo $!)
+        fi
+      else
+        if [[ -z $REPLY ]]; then
+          read < <(start-slideshow & echo $!)
+        else
+          stop-slideshow
+        fi
+      fi
+      ;;
+    '.')
+      echo next
+      ;;
+    ',')
+      echo prev
+      ;;
+    '!')
+      echo remove
+      ;;
+    ':')
+      stop-slideshow
+      rm /tmp/wpd
+      break
+      ;;
+    *)
+      echo "add $cmd"
+      ;;
+  esac
+done

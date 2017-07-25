@@ -1,0 +1,4 @@
+#compdef wpc
+
+. ~/env/bin/wpd
+_files -W $walls -F active_dirname

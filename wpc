@@ -1,0 +1,10 @@
+#!/usr/bin/env zsh
+
+[[ -p /tmp/wpd ]] || exit 1
+
+if [[ "$1" == '-' ]]; then
+  # '-' doesn't go through in zsh, but it does in bash..??
+  echo '!' > /tmp/wpd
+else
+  echo "$@" > /tmp/wpd
+fi
