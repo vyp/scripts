@@ -3,10 +3,15 @@
 activate () {
   for file in $@; do
     if [[ ${file:0:1} != '/' ]]; then
-      file="$walls/$active_dirname/$file"
+      file="$walls/$file"
     fi
 
-    echo "$file"
+    if [[ -d "$file" ]]; then
+      # `(N)' skips empty directories.
+      [[ "$file" != "$walls/$active_dirname" ]] && activate $file/*(N)
+    else
+      echo "$file"
+    fi
   done
 }
 
