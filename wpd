@@ -60,7 +60,7 @@ main () {
   [[ -p $fifo ]] || ([[ -f $fifo ]] && exit 1 || mkfifo $fifo)
 
   mkdir -p "$walls/$active_dirname"
-  local -a current_wall
+  local -a curwp
 
   while :; do
     args=$(<$fifo)
