@@ -34,7 +34,11 @@ add () {
 # to their contents.
 activate () {
   for file in $@; do
-    [[ ${file:0:1} != '/' ]] && file="$walls/$file"
+    if [[ ${file:0:1} != '/' ]]; then
+      file="$walls/$file"
+    else
+      [[ $file =~ $walls ]] || continue
+    fi
 
     if [[ -d "$file" ]]; then
       [[ "$file" != "$walls/$active_dirname" ]] && activate $file/*(N)
