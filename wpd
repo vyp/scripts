@@ -23,8 +23,11 @@ subdirs () {
 add () {
   local subdirs=$(subdirs "$1")
   local link="$walls/$active_dirname/$subdirs/$(basename $1)"
-  mkdir -p "$walls/$active_dirname/$subdirs"
-  [[ -L "$link" ]] || ln -s "$1" "$link"
+
+  if [[ -f "$1" ]]; then
+    mkdir -p "$walls/$active_dirname/$subdirs"
+    [[ -L "$link" ]] || ln -s "$1" "$link"
+  fi
 }
 
 # Symlinks arguments to active directory. Directories are recursively expanded
