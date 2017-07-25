@@ -1,4 +1,7 @@
 #compdef wpc
 
 . ~/env/bin/wpd
+# Confusing, but -F argument doesn't need the `$' unlike -W. So the argument
+# actually evaluates to the $active_dirname variable, not the string
+# 'active_dirname'.
 _files -W $walls -F active_dirname
