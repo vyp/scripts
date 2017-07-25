@@ -16,9 +16,7 @@ add () {
 # to their contents.
 activate () {
   for file in $@; do
-    if [[ ${file:0:1} != '/' ]]; then
-      file="$walls/$file"
-    fi
+    file="$walls/$file"
 
     if [[ -d "$file" ]]; then
       # `(N)' skips empty directories.
