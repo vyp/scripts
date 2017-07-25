@@ -26,34 +26,43 @@ add () {
   ln -s "$1" "$walls/$active_dirname/$subdirs/$(basename $1)"
 }
 
-# Symlinks arguments to active directory. Directories are recursively expanded
-# to their contents.
-activate () {
-  for file in $@; do
-    file="$walls/$file"
+active () {
+  for file in ${@:2}; do
+    [[ ${file:0:1} != '/' ]] && file="$walls/$file"
 
     if [[ -d "$file" ]]; then
-      # `(N)' skips empty directories.
-      [[ "$file" != "$walls/$active_dirname" ]] && activate $file/*(N)
+      [[ "$file" != "$walls/$active_dirname" ]] && active $1 $file/*(N)
     else
-      if [[ ${#filetypes[@]} -eq 0 ]]; then
-        add "$file"
-      else
-        for filetype in $filetypes; do
-          if [[ "$file" == *.$filetype ]]; then
-            add "$file"
-	    break
-          fi
-        done
-      fi
+      [[ $1 == 'add' ]] && activate "$file" || deactivate "$file"
     fi
   done
 }
 
+# Symlinks arguments to active directory. Directories are recursively expanded
+# to their contents.
+activate () {
+  if [[ ${#filetypes[@]} -eq 0 ]]; then
+    add "$1"
+  else
+    for filetype in $filetypes; do
+      if [[ "$1" == *.$filetype ]]; then
+        add "$1"
+        break
+      fi
+    done
+  fi
+}
+
 deactivate () {
-  for file in $@; do
-    echo $file
-  done
+  echo "$1"
+  # for file in $@; do
+  #   file="$walls/$file"
+
+  #   if [[ -d "$file" ]]; then
+  #     [[ "$file" != "$walls/$active_dirname" ]] && deactivate $file/*(N)
+  #   else
+  #   fi
+  # done
 }
 
 main () {
@@ -107,10 +116,10 @@ main () {
         fi
         ;;
       '!')
-        deactivate $args
+        [[ -z ${args:1} ]] && echo no || active remove ${args:1}
         ;;
       *)
-        [[ -z $args ]] && activate $walls || activate $args
+        [[ -z $args ]] && active add $walls || active add $args
         ;;
     esac
   done
