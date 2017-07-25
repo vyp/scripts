@@ -1,5 +1,17 @@
 #!/usr/bin/env zsh
 
+subdirs () {
+  local filename=$(basename "$1")
+  local subdirs=${1#$walls/}
+  echo ${subdirs%/$filename}
+}
+
+add () {
+  local subdirs=$(subdirs "$1")
+  mkdir -p "$walls/$active_dirname/$subdirs"
+  ln -s "$1" "$walls/$active_dirname/$subdirs/$(basename $1)"
+}
+
 # Symlinks arguments to active directory. Directories are recursively expanded
 # to their contents.
 activate () {
@@ -13,11 +25,11 @@ activate () {
       [[ "$file" != "$walls/$active_dirname" ]] && activate $file/*(N)
     else
       if [[ ${#filetypes[@]} -eq 0 ]]; then
-        echo "$file"
+        add "$file"
       else
         for filetype in $filetypes; do
           if [[ "$file" == *.$filetype ]]; then
-            echo "$file"
+            add "$file"
 	    break
           fi
         done
@@ -95,7 +107,7 @@ main () {
         break
         ;;
       *)
-        activate $args
+        [[ -z $args ]] && activate $walls || activate $args
         ;;
     esac
   done
