@@ -65,12 +65,22 @@ main () {
     args=${(z)args}
 
     case "${args:0:1}" in
+      ':')
+        stop-slideshow
+        rm $fifo
+        break
+        ;;
       '=')
-        echo set
+        echo $cmd $cmd_opts $curwp
         ;;
       '_')
         [[ $shuffle -eq 0 ]] && shuffle=1 || shuffle=0
-        echo $shuffle
+        ;;
+      '.')
+        echo next
+        ;;
+      ',')
+        echo prev
         ;;
       '+')
         if [[ -n ${args:1:2} ]]; then
@@ -90,19 +100,8 @@ main () {
           fi
         fi
         ;;
-      '.')
-        echo next
-        ;;
-      ',')
-        echo prev
-        ;;
       '!')
         echo remove
-        ;;
-      ':')
-        stop-slideshow
-        rm $fifo
-        break
         ;;
       *)
         [[ -z $args ]] && activate $walls || activate $args
