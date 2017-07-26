@@ -1,5 +1,33 @@
 #!/usr/bin/env zsh
 
+rand-arg () {
+  [[ $# -eq 0 ]] && return 0
+
+  if [[ $# -eq 1 ]]; then
+    echo "$1"
+  else
+    local rand=$((1 + $RANDOM % $#))
+    echo $@[$rand]
+  fi
+}
+
+set-wall () {
+  $cmd $cmd_opts "$1"
+}
+
+next () {
+  local active_walls=($(echo $walls/$active_dirname/**/*(@)))
+  local active_len=${#active_walls[@]}
+
+  if [[ $active_len -gt 0 ]]; then
+    if [[ $active_len -eq 1 ]]; then
+      set-wall $active_len[1]
+    else
+      :
+    fi
+  fi
+}
+
 start-slideshow () {
   while :; do
     sleep $interval
@@ -93,7 +121,8 @@ main () {
   [[ -p $fifo ]] || ([[ -f $fifo ]] && exit 1 || mkfifo $fifo)
 
   mkdir -p "$walls/$active_dirname"
-  local -a curwp
+  used_walls=()
+  curwall=''
 
   while :; do
     args=$(<$fifo)
@@ -106,13 +135,13 @@ main () {
         break
         ;;
       '=')
-        echo $cmd $cmd_opts $curwp
+        echo $cmd $cmd_opts wall
         ;;
       '_')
         [[ $shuffle -eq 0 ]] && shuffle=1 || shuffle=0
         ;;
       '.')
-        echo next
+        next
         ;;
       ',')
         echo prev
