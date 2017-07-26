@@ -17,6 +17,8 @@ tags=$(herbstclient tag_status)
 tags=${(z)tags}
 tags="${tags[*]}"
 
+# FIXME: When there's an urgent window in the current tag, this loop never
+# ends.
 while [[ ${tags:0:1} != '#' ]]; do
   tags=${(z)tags}
   tags=(${tags:1} ${tags:0:1})
