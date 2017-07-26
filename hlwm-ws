@@ -13,24 +13,21 @@ both () {
   action use $1
 }
 
-tags=$(herbstclient tag_status)
+local tag_index=0
+local tags=$(herbstclient tag_status)
 tags=${(z)tags}
-tags="${tags[*]}"
 
-# FIXME: When there's an urgent window in the current tag, this loop never
-# ends.
-while [[ ${tags:0:1} != '#' ]]; do
-  tags=${(z)tags}
+while [[ $tag_index -lt $(herbstclient attr tags.focus.index) ]]; do
   tags=(${tags:1} ${tags:0:1})
-  tags="${tags[*]}"
+  tag_index=$(($tag_index + 1))
 done
 
-tags=${(z)tags}
 tags=(${tags:1})
 
 for tag in $tags; do
-  if ([[ $2 == 'free' ]]     && [[ ${tag:0:1} == '.' ]]) || \
-     ([[ $2 == 'occupied' ]] && [[ ${tag:0:1} == ':' ]]); then
+  if ([[ $2 == 'free' ]]     &&  [[ ${tag:0:1} == '.' ]]) || \
+     ([[ $2 == 'occupied' ]] && ([[ ${tag:0:1} == ':' ]]  || \
+                                 [[ ${tag:0:1} == '!' ]])); then
     tag=${tag:1:2}
     [[ $1 == 'both' ]] && both $tag || action $1 $tag
     break
