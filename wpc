@@ -1,12 +1,13 @@
 #!/usr/bin/env zsh
 
-[[ -p /tmp/wpd ]] || exit 1
+. ~/env/bin/wpd
+[[ -p $fifo ]] || exit 1
 
 if [[ "$1" == '-' ]]; then
   # '-' doesn't go through in zsh, but it does in bash..??
   # And so apparently ${@:2} needs to be used to cut off the hyphen, instead of
   # ${@:1} as you would expect.. :|
-  echo '!' ${@:2} > /tmp/wpd
+  echo '!' ${@:2} > $fifo
 else
-  echo "$@" > /tmp/wpd
+  echo "$@" > $fifo
 fi
