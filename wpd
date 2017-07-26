@@ -86,7 +86,7 @@ deactivate () {
 }
 
 main () {
-  . ~/env/bin/wpd
+  . $BIN_CONFIG_HOME/wpd
 
   # Exit with error if $fifo file already exists but isn't a pipe. Otherwise
   # create pipe if it doesn't exist.
