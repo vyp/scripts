@@ -26,6 +26,10 @@ tramp
 ## AUCTeX auto folder.
 /auto/
 
+# Nix.
+result
+result-*
+
 # Vim.
 .*.s[a-w][a-z]
 .s[a-w][a-z]
