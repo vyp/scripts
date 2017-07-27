@@ -1,0 +1,34 @@
+# -*- mode: gitignore; -*-
+# Emacs.
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+## Org-mode.
+.org-id-locations
+*_archive
+
+## Flymake-mode.
+*_flymake.*
+
+## Eshell files.
+/eshell/history
+/eshell/lastdir
+
+## Reftex files.
+*.rel
+
+## AUCTeX auto folder.
+/auto/
+
+# Vim.
+.*.s[a-w][a-z]
+.s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
