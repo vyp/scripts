@@ -44,10 +44,36 @@ rand-arg () {
   fi
 }
 
-set-wall () {
-  $cmd $cmd_opts "$1"
+modify-walls-state () {
   curwall="$1"
-  [[ $(str-array-member-p "used_walls" $curwall) -eq 0 ]] && used_walls+=("$1")
+
+  if [[ $(str-array-member-p "used_walls" $curwall) -eq 0 ]]; then
+    used_walls+=("$curwall")
+  fi
+}
+
+set-wall () {
+  if [[ $# -gt 0 ]]; then
+    local wall=()
+    local opts=()
+
+    for arg in $@; do
+      [[ $arg == /* ]] && wall+=$arg || opts+=$arg
+    done
+
+    local wall_len=${#wall[@]}
+    local opts_len=${#opts[@]}
+
+    if [[ $wall_len -eq 0 ]]; then
+      [[ $opts_len -gt 0 ]] && [[ -n "$curwall" ]] && $cmd $@ "$curwall"
+    elif [[ $opts_len -eq 0 ]]; then
+      $cmd "$1"
+      modify-walls-state "$1"
+    else
+      $cmd $@
+      modify-walls-state "$wall[1]"
+    fi
+  fi
 }
 
 next () {
@@ -56,7 +82,7 @@ next () {
 
   if [[ $active_len -gt 0 ]]; then
     if [[ $active_len -eq 1 ]]; then
-      set-wall "$active_walls[1]"
+      set-wall $cmd_opts "$active_walls[1]"
     else
       local available_walls=($(diff-str-arrays "active_walls" "used_walls"))
       local available_len=${#available_walls[@]}
@@ -70,14 +96,14 @@ next () {
       fi
 
       if [[ $shuffle -eq 1 ]]; then
-        set-wall $(rand-arg $available_walls)
+        set-wall $cmd_opts $(rand-arg $available_walls)
       else
         local match=0
         local set_p=0
 
         for wall in $active_walls; do
           if [[ $match -eq 1 ]]; then
-            set-wall "$wall"
+            set-wall $cmd_opts "$wall"
             set_p=1
             break
           fi
@@ -85,7 +111,7 @@ next () {
           [[ $wall == $curwall ]] && match=1
         done
 
-        [[ $set_p -eq 0 ]] && set-wall "$active_walls[1]"
+        [[ $set_p -eq 0 ]] && set-wall $cmd_opts "$active_walls[1]"
       fi
     fi
   fi
@@ -103,7 +129,7 @@ prev () {
 
     for wall in $used_walls_rev; do
       if [[ $match -eq 1 ]]; then
-        set-wall "$wall"
+        set-wall $cmd_opts "$wall"
         set_p=1
         break
       fi
@@ -111,7 +137,7 @@ prev () {
       [[ $wall == $curwall ]] && match=1
     done
 
-    [[ $set_p -eq 0 ]] && set-wall "$used_walls_rev[1]"
+    [[ $set_p -eq 0 ]] && set-wall $cmd_opts "$used_walls_rev[1]"
   fi
 }
 
@@ -152,7 +178,7 @@ activate () {
     if [[ ${file:0:1} != '/' ]]; then
       file="$walls/$file"
     else
-      [[ "$file" =~ "$walls" ]] || continue
+      [[ "$file" == $walls* ]] || continue
     fi
 
     if [[ -d "$file" ]]; then
@@ -189,7 +215,7 @@ deactivate () {
     if [[ ${file:0:1} != '/' ]]; then
       file="$walls/$active_dirname/$file"
     else
-      [[ "$file" =~ "$walls/$active_dirname" ]] || continue
+      [[ "$file" == $walls/$active_dirname* ]] || continue
     fi
 
     if [[ -d "$file" ]]; then
@@ -222,7 +248,34 @@ main () {
         break
         ;;
       '=')
-        echo $cmd $cmd_opts wall
+        local wall=''
+        local opts=()
+        local file_count=0
+        local invalid_file=0
+
+        for arg in ${args:1}; do
+          if [[ $arg != -* ]]; then
+            [[ $arg == /* ]] || arg=$walls/$arg
+
+            if [[ "$arg" == $walls* ]] && [[ -f "$arg" ]]; then
+              wall=$arg
+              file_count=$(($file_count + 1))
+            else
+              invalid_file=1
+            fi
+          else
+            opts+="$arg"
+          fi
+        done
+
+        if [[ $invalid_file -eq 0 ]]; then
+          if [[ $file_count -eq 1 ]]; then
+            activate $wall
+            set-wall $opts "$wall"
+          else
+            [[ $file_count -eq 0 ]] && set-wall $opts
+          fi
+        fi
         ;;
       '_')
         [[ $shuffle -eq 0 ]] && shuffle=1 || shuffle=0
