@@ -1,5 +1,24 @@
 #!/usr/bin/env zsh
 
+diff-arrays () {
+  local array1=$1
+  local array2=$2
+  local result=()
+  local -i match
+
+  for ele in ${(P)${array1}}; do
+    match=0
+
+    for el in ${(P)${array2}}; do
+      [[ $ele == $el ]] && match=1
+    done
+
+    [[ $match -eq 0 ]] && result+=$ele
+  done
+
+  echo $result
+}
+
 rand-arg () {
   [[ $# -eq 0 ]] && return 0
 
@@ -21,7 +40,7 @@ next () {
 
   if [[ $active_len -gt 0 ]]; then
     if [[ $active_len -eq 1 ]]; then
-      set-wall $active_len[1]
+      set-wall $active_walls[1]
     else
       :
     fi
@@ -141,7 +160,9 @@ main () {
         [[ $shuffle -eq 0 ]] && shuffle=1 || shuffle=0
         ;;
       '.')
-        next
+        foo=(hello how are you world)
+        bar=(hello world)
+        diff-arrays "foo" "bar"
         ;;
       ',')
         echo prev
