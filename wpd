@@ -91,6 +91,30 @@ next () {
   fi
 }
 
+prev () {
+  local used_len=${#used_walls[@]}
+
+  if [[ $used_len -eq 0 ]] || [[ $used_len -eq 1 ]]; then
+    next
+  else
+    local used_walls_rev=(${(Oa)used_walls})
+    local match=0
+    local set_p=0
+
+    for wall in $used_walls_rev; do
+      if [[ $match -eq 1 ]]; then
+        set-wall "$wall"
+        set_p=1
+        break
+      fi
+
+      [[ $wall == $curwall ]] && match=1
+    done
+
+    [[ $set_p -eq 0 ]] && set-wall "$used_walls_rev[1]"
+  fi
+}
+
 start-slideshow () {
   while :; do
     sleep $interval
@@ -207,7 +231,7 @@ main () {
         next
         ;;
       ',')
-        echo prev
+        prev
         ;;
       '+')
         if [[ -n ${args:1:2} ]]; then
