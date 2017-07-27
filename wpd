@@ -1,6 +1,20 @@
 #!/usr/bin/env zsh
 
-diff-arrays () {
+str-array-member-p () {
+  local array=$1
+  local match=0
+
+  for member in ${(P)${array}}; do
+    if [[ $2 == $member ]]; then
+      match=1
+      break
+    fi
+  done
+
+  echo $match
+}
+
+diff-str-arrays () {
   local array1=$1
   local array2=$2
   local result=()
@@ -32,17 +46,47 @@ rand-arg () {
 
 set-wall () {
   $cmd $cmd_opts "$1"
+  curwall="$1"
+  [[ $(str-array-member-p "used_walls" $curwall) -eq 0 ]] && used_walls+=("$1")
 }
 
 next () {
-  local active_walls=($(echo $walls/$active_dirname/**/*(@)))
+  local active_walls=($(echo $walls/$active_dirname/**/*(@N)))
   local active_len=${#active_walls[@]}
 
   if [[ $active_len -gt 0 ]]; then
     if [[ $active_len -eq 1 ]]; then
-      set-wall $active_walls[1]
+      set-wall "$active_walls[1]"
     else
-      :
+      local available_walls=($(diff-str-arrays "active_walls" "used_walls"))
+      local available_len=${#available_walls[@]}
+
+      # Loop over to use previously used wallpapers again if there's no unused
+      # ones to pick from.
+      if [[ $available_len -eq 0 ]]; then
+        available_walls=$active_walls
+        available_len=${#available_walls[@]}
+        used_walls=()
+      fi
+
+      if [[ $shuffle -eq 1 ]]; then
+        set-wall $(rand-arg $available_walls)
+      else
+        local match=0
+        local set_p=0
+
+        for wall in $active_walls; do
+          if [[ $match -eq 1 ]]; then
+            set-wall "$wall"
+            set_p=1
+            break
+          fi
+
+          [[ $wall == $curwall ]] && match=1
+        done
+
+        [[ $set_p -eq 0 ]] && set-wall "$active_walls[1]"
+      fi
     fi
   fi
 }
@@ -50,7 +94,7 @@ next () {
 start-slideshow () {
   while :; do
     sleep $interval
-    # next
+    next
   done
 }
 
@@ -160,9 +204,7 @@ main () {
         [[ $shuffle -eq 0 ]] && shuffle=1 || shuffle=0
         ;;
       '.')
-        foo=(hello how are you world)
-        bar=(hello world)
-        diff-arrays "foo" "bar"
+        next
         ;;
       ',')
         echo prev
