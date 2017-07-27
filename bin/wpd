@@ -76,13 +76,17 @@ set-wall () {
   fi
 }
 
+set-wall-default () {
+  [[ -z $cmd_opts ]] && set-wall "$1" || set-wall $cmd_opts "$1"
+}
+
 next () {
   local active_walls=($(echo $walls/$active_dirname/**/*(@N)))
   local active_len=${#active_walls[@]}
 
   if [[ $active_len -gt 0 ]]; then
     if [[ $active_len -eq 1 ]]; then
-      set-wall $cmd_opts "$active_walls[1]"
+      set-wall-default "$active_walls[1]"
     else
       local available_walls=($(diff-str-arrays "active_walls" "used_walls"))
       local available_len=${#available_walls[@]}
@@ -96,14 +100,14 @@ next () {
       fi
 
       if [[ $shuffle -eq 1 ]]; then
-        set-wall $cmd_opts $(rand-arg $available_walls)
+        set-wall-default $(rand-arg $available_walls)
       else
         local match=0
         local set_p=0
 
         for wall in $active_walls; do
           if [[ $match -eq 1 ]]; then
-            set-wall $cmd_opts "$wall"
+            set-wall-default "$wall"
             set_p=1
             break
           fi
@@ -111,7 +115,7 @@ next () {
           [[ $wall == $curwall ]] && match=1
         done
 
-        [[ $set_p -eq 0 ]] && set-wall $cmd_opts "$active_walls[1]"
+        [[ $set_p -eq 0 ]] && set-wall-default "$active_walls[1]"
       fi
     fi
   fi
@@ -129,7 +133,7 @@ prev () {
 
     for wall in $used_walls_rev; do
       if [[ $match -eq 1 ]]; then
-        set-wall $cmd_opts "$wall"
+        set-wall-default "$wall"
         set_p=1
         break
       fi
@@ -137,7 +141,7 @@ prev () {
       [[ $wall == $curwall ]] && match=1
     done
 
-    [[ $set_p -eq 0 ]] && set-wall $cmd_opts "$used_walls_rev[1]"
+    [[ $set_p -eq 0 ]] && set-wall-default "$used_walls_rev[1]"
   fi
 }
 
