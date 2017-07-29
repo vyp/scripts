@@ -17,7 +17,7 @@ Usage:
 $ hlwm-tag <action> <tag>
 #+END_SRC
 
-Where =<action>= is either =use=, =move= or =index=, and =<tag>= is either
+Where =<action>= is either =use=, =move= or =both=, and =<tag>= is either
 =free= or =occupied=.
 
 * wpd
