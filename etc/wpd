@@ -10,7 +10,7 @@ local filetypes=(jpg png)
 # Relative to ${walls}.
 local active_dirname='active'
 
-local interval=2
+local interval=1200
 local shuffle=1
 local cmd='setroot'
 # Leave empty to pass no options.
