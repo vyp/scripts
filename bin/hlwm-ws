@@ -13,11 +13,12 @@ both () {
   action use $1
 }
 
+local curtag_index=$(herbstclient attr tags.focus.index)
 local tag_index=0
 local tags=$(herbstclient tag_status)
 tags=${(z)tags}
 
-while [[ $tag_index -lt $(herbstclient attr tags.focus.index) ]]; do
+while [[ $tag_index -lt $curtag_index ]]; do
   tags=(${tags:1} ${tags:0:1})
   tag_index=$(($tag_index + 1))
 done
@@ -25,7 +26,7 @@ done
 tags=(${tags:1})
 
 for tag in $tags; do
-  if ([[ $2 == 'free' ]]     &&  [[ ${tag:0:1} == '.' ]]) || \
+  if ([[ $2 == 'free'     ]] &&  [[ ${tag:0:1} == '.' ]]) || \
      ([[ $2 == 'occupied' ]] && ([[ ${tag:0:1} == ':' ]]  || \
                                  [[ ${tag:0:1} == '!' ]])); then
     tag=${tag:1:2}
