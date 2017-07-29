@@ -1,0 +1,89 @@
+Various small utility scripts for my =$PATH= under the =bin= directory. =etc=
+contains configuration files for them if applicable. Some of them may be fairly
+reusable as is for others, whereas other scripts may be very specific to my
+setup ([[https://github.com/vyp/dots][vyp/dots]]).
+
+* hlwm-ws
+
+A small =herbstclient= wrapper script for use with
+[[http://www.herbstluftwm.org][herbstluftwm]].
+
+It can be used to either switch to, or move the focused client to, the next
+occupied or free tag.
+
+Usage:
+
+#+BEGIN_SRC shell-script
+$ hlwm-ws <action> <tag>
+#+END_SRC
+
+Where =<action>= is either =use=, =move= or =index=, and =<tag>= is either
+=free= or =occupied=.
+
+* wpd
+
+A rudimentary wallpaper switching script.
+
+Short for "wallpaper daemon", it can be used to change the wallpaper either
+interactively or automatically after a set period. It doesn't /actually/ set
+the wallpaper itself, you have to use a separate program for that, which can be
+specified in the configuration file (see =etc/wpd= for an example configuration
+file). I recommend [[https://github.com/ttzhou/setroot][setroot]].
+
+The idea is that you have a directory full of wallpaper pictures from which you
+can start a 'slideshow' from, to be able to switch wallpapers automatically in
+the background after a set interval.
+
+Where =wpd= differentiates itself though is that it allows you to easily pick
+from a subset of your wallpaper collection to be 'activated', i.e. those that
+the slideshow mode picks from. It does this by having an /active/ directory
+where it symlinks the files/directories that you specify to be activated, and
+it just picks wallpapers to set from there.
+
+Usage:
+
+#+BEGIN_SRC shell-script
+# Start daemon:
+$ wpd
+
+# Activate all wallpapers:
+$ wpc
+
+# Activate only specific wallpapers:
+$ wpc <path to wallpaper or subdirectory>
+
+# Toggle slideshow on/off:
+$ wpc +
+
+# Change default interval for slideshow:
+$ wpc + 600 # 10 minutes
+
+# An interval of 0 stops the slideshow:
+$ wpc + 0
+
+# Unlink all activated wallpapers:
+$ wpc -
+
+# Unlink only specific activated wallpapers:
+$ wpc - <path to wallpaper or subdirectory>
+
+# Toggle shuffle on/off:
+$ wpc _
+
+# Go to next wallpaper:
+$ wpc .
+
+# Go to previous wallpaper:
+$ wpc ,
+
+# Ad-hoc set a wallpaper:
+$ wpc = [command options] [path to wallpaper]
+#
+# Wallpaper will be activated if it is not already active.
+#
+# Passing no [path to wallpaper] will use the set wallpaper command with the
+# specified options with the current wallpaper.
+
+# Quit daemon:
+# wpc :
+#+END_SRC
