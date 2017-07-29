@@ -3,7 +3,7 @@ contains configuration files for them if applicable. Some of them may be fairly
 reusable as is for others, whereas other scripts may be very specific to my
 setup ([[https://github.com/vyp/dots][vyp/dots]]).
 
-* hlwm-ws
+* hlwm-tag
 
 A small =herbstclient= wrapper script for use with
 [[http://www.herbstluftwm.org][herbstluftwm]].
@@ -14,7 +14,7 @@ occupied or free tag.
 Usage:
 
 #+BEGIN_SRC shell-script
-$ hlwm-ws <action> <tag>
+$ hlwm-tag <action> <tag>
 #+END_SRC
 
 Where =<action>= is either =use=, =move= or =index=, and =<tag>= is either
