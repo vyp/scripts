@@ -291,18 +291,23 @@ main () {
         prev
         ;;
       '+')
+        local active_walls=($(echo $walls/$active_dirname/**/*(@N)))
+        local active_len=${#active_walls[@]}
+
         if [[ -n ${args:1:2} ]]; then
           if [[ ${args:1:2} -eq 0 ]]; then
             stop-slideshow
           else
-            stop-slideshow
-            interval=${args:1:2}
-            # PID of start-slideshow subshell is stored in $REPLY variable.
-            read < <(start-slideshow & echo $!)
+            if [[ $active_len -gt 1 ]]; then
+              stop-slideshow
+              interval=${args:1:2}
+              # PID of start-slideshow subshell is stored in $REPLY variable.
+              read < <(start-slideshow & echo $!)
+            fi
           fi
         else
           if [[ -z $REPLY ]]; then
-            read < <(start-slideshow & echo $!)
+            [[ $active_len -gt 1 ]] && read < <(start-slideshow & echo $!)
           else
             stop-slideshow
           fi
