@@ -22,6 +22,10 @@ Where =<action>= is either =use=, =move= or =both=, and =<tag>= is either
 
 * wpd
 
+NOTE: While it comes close and while I thought some parts of this script were
+neat, it doesn't work the way I wanted to (in that I cannot seem to start it on
+startup), so I'm probably going to rewrite this or just give up on it.
+
 A rudimentary wallpaper switching script.
 
 Short for "wallpaper daemon", it can be used to change the wallpaper either
