@@ -14,7 +14,7 @@ both () {
 }
 
 main () {
-  local curtag_index=$(herbstclient attr tags.focus.index)
+  declare -r curtag_index=$(herbstclient attr tags.focus.index)
   local tag_index=0
   local tags=$(herbstclient tag_status)
   tags=${(z)tags}
