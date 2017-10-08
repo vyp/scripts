@@ -1,0 +1,64 @@
+#! /usr/bin/env bash
+
+set -e
+cd $(nix-instantiate --find-file nixpkgs)
+
+nix-build -A luaPackages.luabitop
+nix-build -A luaPackages.luacheck
+# nix-build -A luaPackages.luaevent # disabled
+nix-build -A luaPackages.luaexpat
+nix-build -A luaPackages.luafilesystem
+nix-build -A luaPackages.luaposix
+nix-build -A luaPackages.lpty
+nix-build -A luaPackages.lua-iconv
+nix-build -A luaPackages.luasec
+nix-build -A luaPackages.luasocket
+nix-build -A luaPackages.luxio
+# nix-build -A luaPackages.luazip # disabled
+nix-build -A luaPackages.luazlib
+nix-build -A luaPackages.luastdlib
+nix-build -A luaPackages.lrexlib
+nix-build -A luaPackages.luasqlite3
+nix-build -A luaPackages.lpeg
+nix-build -A luaPackages.cjson
+nix-build -A luaPackages.mpack
+
+nix-build -A luajitPackages.luabitop
+nix-build -A luajitPackages.luacheck
+nix-build -A luajitPackages.luaevent
+# nix-build -A luajitPackages.luaexpat # master fails
+nix-build -A luajitPackages.luafilesystem
+nix-build -A luajitPackages.luaposix
+nix-build -A luajitPackages.lpty
+nix-build -A luajitPackages.lua-iconv
+nix-build -A luajitPackages.luasec
+nix-build -A luajitPackages.luasocket
+nix-build -A luajitPackages.luxio
+# nix-build -A luajitPackages.luazip # master fails
+nix-build -A luajitPackages.luazlib
+nix-build -A luajitPackages.luastdlib
+nix-build -A luajitPackages.lrexlib
+nix-build -A luajitPackages.luasqlite3
+nix-build -A luajitPackages.lpeg
+# nix-build -A luajitPackages.cjson # master fails
+# nix-build -A luajitPackages.mpack # marked as broken
+
+nix-build -A lua51Packages.luabitop
+nix-build -A lua51Packages.luacheck
+nix-build -A lua51Packages.luaevent
+nix-build -A lua51Packages.luaexpat
+nix-build -A lua51Packages.luafilesystem
+nix-build -A lua51Packages.luaposix
+nix-build -A lua51Packages.lpty
+nix-build -A lua51Packages.lua-iconv
+nix-build -A lua51Packages.luasec
+nix-build -A lua51Packages.luasocket
+nix-build -A lua51Packages.luxio
+nix-build -A lua51Packages.luazip
+nix-build -A lua51Packages.luazlib
+nix-build -A lua51Packages.luastdlib
+nix-build -A lua51Packages.lrexlib
+nix-build -A lua51Packages.luasqlite3
+nix-build -A lua51Packages.lpeg
+nix-build -A lua51Packages.cjson
+nix-build -A lua51Packages.mpack
