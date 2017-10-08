@@ -1,7 +1,6 @@
-Various small utility scripts for my =$PATH= under the =bin= directory. =etc=
-contains configuration files for them if applicable. Some of them may be fairly
-reusable as is for others, whereas other scripts may be very specific to my
-setup 👉 [[https://github.com/vyp/dots][vyp/dots]].
+Various small utility scripts for my =$PATH= under the =bin= directory. Some of
+them may be fairly reusable as is for others, whereas other scripts may be very
+specific to my setup 👉 [[https://github.com/vyp/dots][vyp/dots]].
 
 * hlwm-tag
 
