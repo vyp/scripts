@@ -1,0 +1,38 @@
+#!/run/current-system/sw/bin/guile \
+-e main -s
+!#
+
+(use-modules (personal scripting))
+(use-modules (site pipe))
+
+(define (colors)
+  (->> (string-split (system-output "xrdb -query")
+                     (lambda (c) (char=? c #\newline)))
+       (filter (lambda (xresource) (string-prefix? "polybar." xresource)))))
+
+(define (status tag)
+  (car tag))
+
+(define (name tag)
+  (cdr tag))
+
+(define (focus? tag)
+  (equal? "#" (status tag)))
+
+(define (focused-tag? tags)
+  (not (->> (filter focus? tags)
+            (null?))))
+
+(define (tag-string tag)
+  (let ((padding " "))
+    padding
+  ))
+
+(define (tags)
+  (->> (string-split (system-output "herbstclient tag_status") char-whitespace?)
+       (filter (lambda (s) (not (string-null? s))))
+       (map (lambda (ws) (cons (string-ref ws 0) (string-ref ws 1))))))
+
+(define (main args)
+  (let ((tags (tags)))
+    (display (string-join (colors) "\n"))))
