@@ -44,10 +44,6 @@
 (define (tag-status tag)
   (string (string-ref tag 0)))
 
-(define (focused-tag? tags)
-  (not (->> (filter (lambda (tag) (equal? (tag-name tag) "#")) tags)
-            (null?))))
-
 (define (tag-name->icon name)
   (match name
          ("1" "")
