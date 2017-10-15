@@ -26,6 +26,7 @@
        (string-trim-both)))
 
 (define xcolors
+  ;; Try to use fold instead here, instead of set!.
   (let ((xcolors '()))
     (->> (string-split (system-output "xrdb -query")
                        (lambda (c) (char=? c #\newline)))
