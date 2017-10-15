@@ -5,10 +5,26 @@
 (use-modules (personal scripting))
 (use-modules (site pipe))
 
-(define (colors)
-  (->> (string-split (system-output "xrdb -query")
-                     (lambda (c) (char=? c #\newline)))
-       (filter (lambda (xresource) (string-prefix? "polybar." xresource)))))
+(define (xcolor-name xresource)
+  (substring xresource
+             (+ 1 (string-index xresource #\.))
+             (string-index xresource #\:)))
+
+(define (xcolor-value xresource)
+  (->> (substring xresource (+ 1 (string-index xresource #\:)))
+       (string-trim-both)))
+
+(define (xcolors)
+  (let ((xcolors '()))
+    (->> (string-split (system-output "xrdb -query")
+                       (lambda (c) (char=? c #\newline)))
+         (filter (lambda (xresource) (string-prefix? "polybar." xresource)))
+         (map (lambda (xresource)
+                (set! xcolors (acons (xcolor-name xresource)
+                                     (xcolor-value xresource)
+                                     xcolors))
+                xresource)))
+    xcolors))
 
 (define (status tag)
   (car tag))
@@ -31,8 +47,7 @@
 (define (tags)
   (->> (string-split (system-output "herbstclient tag_status") char-whitespace?)
        (filter (lambda (s) (not (string-null? s))))
-       (map (lambda (ws) (cons (string-ref ws 0) (string-ref ws 1))))))
+       (map (lambda (ws) (acons (string-ref ws 1) (string-ref ws 0) '())))))
 
 (define (main args)
-  (let ((tags (tags)))
-    (display (string-join (colors) "\n"))))
+  (display (xcolors)))
