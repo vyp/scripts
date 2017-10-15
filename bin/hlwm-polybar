@@ -5,6 +5,13 @@
 (use-modules (personal scripting))
 (use-modules (site pipe))
 
+(define curtag (system-output "herbstclient attr tags.focus.name"))
+
+(define tags
+  (->> (string-split (system-output "herbstclient tag_status")
+                     char-whitespace?)
+       (filter (lambda (s) (not (string-null? s))))))
+
 (define (xcolor-name xresource)
   (substring xresource
              (+ 1 (string-index xresource #\.))
@@ -14,7 +21,7 @@
   (->> (substring xresource (+ 1 (string-index xresource #\:)))
        (string-trim-both)))
 
-(define (xcolors)
+(define xcolors
   (let ((xcolors '()))
     (->> (string-split (system-output "xrdb -query")
                        (lambda (c) (char=? c #\newline)))
@@ -26,28 +33,23 @@
                 xresource)))
     xcolors))
 
-(define (status tag)
-  (car tag))
+(define (tag-name tag)
+  (string-ref tag 1))
 
-(define (name tag)
-  (cdr tag))
-
-(define (focus? tag)
-  (equal? "#" (status tag)))
+(define (tag-status tag)
+  (string-ref tag 0))
 
 (define (focused-tag? tags)
-  (not (->> (filter focus? tags)
+  (not (->> (filter (lambda (tag) (equal? (tag-name tag) "#")) tags)
             (null?))))
 
 (define (tag-string tag)
   (let ((padding " "))
-    padding
+    (if (equal? (tag-name tag) curtag)
+        (
+        ))
+    (string-append padding padding)
   ))
 
-(define (tags)
-  (->> (string-split (system-output "herbstclient tag_status") char-whitespace?)
-       (filter (lambda (s) (not (string-null? s))))
-       (map (lambda (ws) (acons (string-ref ws 1) (string-ref ws 0) '())))))
-
 (define (main args)
-  (display (xcolors)))
+  (display tags))
