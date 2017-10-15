@@ -82,9 +82,7 @@
                 (set! u (set-u "color1")))
               (set! u (set-u "foreground"))))
         (if (equal? (tag-status tag) "!")
-            (begin
-              (set! fg (set-fg "color1"))
-              (set! u (set-u "color1")))
+            (set! fg (set-fg "color1"))
             (when (equal? (tag-status tag) ".")
                   (set! fg (set-fg "color8")))))
     (string-append bg fg u
