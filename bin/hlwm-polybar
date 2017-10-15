@@ -9,8 +9,7 @@
 
 (define curtag
   (-> (system-output "herbstclient attr tags.focus.name")
-      (string-ref 0)
-      (string)))
+      (string-trim-right #\newline)))
 
 (define tags
   (->> (string-split (system-output "herbstclient tag_status")
