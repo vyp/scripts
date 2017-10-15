@@ -94,4 +94,4 @@
                    reset)))
 
 (define (main args)
-  (display (string-join (map tag-string tags))))
+  (display (string-join (map tag-string tags) "")))
