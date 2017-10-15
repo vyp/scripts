@@ -65,14 +65,14 @@
   (string-append "%{F" (assoc-ref xcolors color) "}"))
 
 (define (set-u color)
-  (string-append "%{u" (assoc-ref xcolors color) " +u}"))
+  (string-append "%{u" (assoc-ref xcolors color) "}"))
 
 (define (tag-string tag)
   (let ((padding "   ")
         (bg "")
         (fg "")
         (u "")
-        (reset "%{B-}%{F-}%{u-}"))
+        (reset "%{B-}%{F-}%{u#00ffffff}"))
     (if (equal? (tag-name tag) curtag)
         (begin
           (set! bg (set-bg "date_background"))
