@@ -7,7 +7,10 @@
 
 (use-modules (ice-9 match))
 
-(define curtag (system-output "herbstclient attr tags.focus.name"))
+(define curtag
+  (-> (system-output "herbstclient attr tags.focus.name")
+      (string-ref 0)
+      (string)))
 
 (define tags
   (->> (string-split (system-output "herbstclient tag_status")
@@ -36,10 +39,10 @@
     xcolors))
 
 (define (tag-name tag)
-  (string-ref tag 1))
+  (string (string-ref tag 1)))
 
 (define (tag-status tag)
-  (string-ref tag 0))
+  (string (string-ref tag 0)))
 
 (define (focused-tag? tags)
   (not (->> (filter (lambda (tag) (equal? (tag-name tag) "#")) tags)
@@ -59,12 +62,40 @@
          ("0" "")
          (_   "")))
 
+(define (set-bg color)
+  (string-append "%{B" (assoc-ref xcolors color) "}"))
+
+(define (set-fg color)
+  (string-append "%{F" (assoc-ref xcolors color) "}"))
+
+(define (set-u color)
+  (string-append "%{u" (assoc-ref xcolors color) " +u}"))
+
 (define (tag-string tag)
-  (let ((padding " "))
+  (let ((padding "   ")
+        (bg "")
+        (fg "")
+        (u "")
+        (reset "%{B-}%{F-}%{u-}"))
     (if (equal? (tag-name tag) curtag)
-        ())
-    (string-append padding padding)
-  ))
+        (begin
+          (set! bg (set-bg "date_background"))
+          (if (equal? (tag-status tag) "!")
+              (begin
+                (set! fg (set-fg "color1"))
+                (set! u (set-u "color1")))
+              (set! u (set-u "foreground"))))
+        (if (equal? (tag-status tag) "!")
+            (begin
+              (set! fg (set-fg "color1"))
+              (set! u (set-u "color1")))
+            (when (equal? (tag-status tag) ".")
+                  (set! fg (set-fg "color8")))))
+    (string-append bg fg u
+                   padding
+                   (tag-name->icon (tag-name tag))
+                   padding
+                   reset)))
 
 (define (main args)
-  (display tags))
+  (display (string-join (map tag-string tags))))
