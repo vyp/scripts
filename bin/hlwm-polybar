@@ -6,6 +6,7 @@
 (use-modules (site pipe))
 
 (use-modules (ice-9 match))
+(use-modules (srfi srfi-1))
 
 (define curtag
   (-> (system-output "herbstclient attr tags.focus.name")
@@ -26,17 +27,12 @@
        (string-trim-both)))
 
 (define xcolors
-  ;; TODO: Try to use fold instead here, instead of set!.
-  (let ((xcolors '()))
-    (->> (string-split (system-output "xrdb -query")
-                       (lambda (c) (char=? c #\newline)))
-         (filter (lambda (xresource) (string-prefix? "polybar." xresource)))
-         (map (lambda (xresource)
-                (set! xcolors (acons (xcolor-name xresource)
-                                     (xcolor-value xresource)
-                                     xcolors))
-                xresource)))
-    xcolors))
+  (->> (string-split (system-output "xrdb -query")
+                     (lambda (c) (char=? c #\newline)))
+       (filter (lambda (xresource) (string-prefix? "polybar." xresource)))
+       (fold (lambda (xresource alist)
+               (acons (xcolor-name xresource)
+                      (xcolor-value xresource) alist)) '())))
 
 (define (tag-name tag)
   (string (string-ref tag 1)))
