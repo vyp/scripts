@@ -84,7 +84,7 @@
         (if (equal? (tag-status tag) "!")
             (set! fg (set-fg "color1"))
             (when (equal? (tag-status tag) ".")
-                  (set! fg (set-fg "color8")))))
+                  (set! fg (set-fg "faded_foreground")))))
     (string-append bg fg u
                    padding
                    (tag-name->icon (tag-name tag))
