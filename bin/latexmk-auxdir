@@ -25,11 +25,11 @@ if [[ $ext == 'tex' ]]; then
   declare -r auxpdf=$auxdir/$pdf
 
   latexmk -lualatex -outdir=$auxdir $file
-  [[ -e $auxpdf ]] && mv -u $auxpdf .
+  [[ -e $auxpdf ]] && ln -fs $auxpdf .
 else
   latexmk -lualatex -outdir=$auxdir
 
   if ls $auxdir/*.pdf >/dev/null 2>&1; then
-    mv -u $auxdir/*.pdf .
+    ln -fs $auxdir/*.pdf .
   fi
 fi

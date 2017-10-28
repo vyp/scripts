@@ -27,11 +27,10 @@ Where =<action>= is either =use=, =move= or =both=, and =<tag>= is either
 
 * latexmk-auxdir
 
-For replicating [[http://personal.psu.edu/~jcc8/software/latexmk/][latexmk]]'s =-auxdir= option, ideally, the following one-liner
-would just work:
+Ideally, the following one-liner would just work:
 
 #+BEGIN_SRC shell-script
-$ latexmk -lualatex -ourdir=.aux && if .aux/*.pdf >/dev/null 2>&1; then mv -u .aux/*.pdf .; fi
+$ latexmk -lualatex -ourdir=.aux && if .aux/*.pdf >/dev/null 2>&1; then ln -fs .aux/*.pdf .; fi
 #+END_SRC
 
 However, latexmk seems to recompile all .tex files regardless of whether they're
@@ -40,5 +39,5 @@ restricted to just the one .tex source file. This is so it can be used with [[ht
 and [[https://github.com/sharkdp/fd][fd]] like so:
 
 #+BEGIN_SRC shell-script
-$ { fd -e tex -d 1 & fd -e png & fd -e jpg } | entr latexmk-auxdir .aux /_
+$ { fd -e tex -d 1; fd -e png; fd -e jpg; } | entr latexmk-auxdir .aux /_
 #+END_SRC
