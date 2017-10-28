@@ -24,20 +24,3 @@ $ hlwm-tag <action> <tag>
 
 Where =<action>= is either =use=, =move= or =both=, and =<tag>= is either
 =free= or =occupied=.
-
-* latexmk-auxdir
-
-Ideally, the following one-liner would just work:
-
-#+BEGIN_SRC shell-script
-$ latexmk -lualatex -ourdir=.aux && if .aux/*.pdf >/dev/null 2>&1; then ln -fs .aux/*.pdf .; fi
-#+END_SRC
-
-However, latexmk seems to recompile all .tex files regardless of whether they're
-already up to date or not. So this wrapper script simply does the above, but is
-restricted to just the one .tex source file. This is so it can be used with [[http://entrproject.org/][entr]]
-and [[https://github.com/sharkdp/fd][fd]] like so:
-
-#+BEGIN_SRC shell-script
-$ { fd -e tex -d 1; fd -e png; fd -e jpg; } | entr latexmk-auxdir .aux /_
-#+END_SRC
