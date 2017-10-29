@@ -27,12 +27,12 @@
                (acons (xresource-name xresource)
                       (xresource-value xresource) alist)) '())))
 
-(define clients
+(define curtag-clients
   (-> (system-output "herbstclient attr tags.focus.client_count")
       (string-trim-right #\newline)
       (string->number)))
 
-(define curtag
+(define curtag-name
   (-> (system-output "herbstclient attr tags.focus.name")
       (string-trim-right #\newline)))
 
@@ -40,12 +40,12 @@
   (string (string-ref tag 1)))
 
 (define (curtag? tag)
-  (equal? (tag-name tag) curtag))
+  (equal? (tag-name tag) curtag-name))
 
 (define (tag-status tag)
   (match (string (string-ref tag 0))
          ("!" 'urgent)
-         ("#" (if (zero? clients) 'free 'occupied))
+         ("#" (if (zero? curtag-clients) 'free 'occupied))
          (":" 'occupied)
          ("." 'free)))
 
