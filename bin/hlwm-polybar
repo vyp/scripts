@@ -8,19 +8,12 @@
 (use-modules (ice-9 match))
 (use-modules (srfi srfi-1))
 
-(define curtag
-  (-> (system-output "herbstclient attr tags.focus.name")
-      (string-trim-right #\newline)))
-
+;; Faster to define this globally just once even though it's only used in
+;; `tag-status'.
 (define clients
   (-> (system-output "herbstclient attr tags.focus.client_count")
       (string-trim-right #\newline)
       (string->number)))
-
-(define tags
-  (->> (string-split (system-output "herbstclient tag_status")
-                     char-whitespace?)
-       (filter (lambda (s) (not (string-null? s))))))
 
 (define (xcolor-name xresource)
   (substring xresource
@@ -41,6 +34,11 @@
 
 (define (tag-name tag)
   (string (string-ref tag 1)))
+
+(define (curtag? tag)
+  (let ((curtag (-> (system-output "herbstclient attr tags.focus.name")
+                    (string-trim-right #\newline))))
+    (equal? (tag-name tag) curtag)))
 
 (define (tag-status tag)
   (match (string (string-ref tag 0))
@@ -70,9 +68,8 @@
         (fg "")
         (u "")
         (reset "%{B-}%{F-}%{u#00ffffff}")
-        (status (tag-status tag))
-        (curtag? (equal? (tag-name tag) curtag)))
-    (when curtag?
+        (status (tag-status tag)))
+    (when (curtag? tag)
           (set! bg (get-bg "date_background"))
           (set! u (get-u (match status
                                 ('free "faded_foreground")
@@ -91,4 +88,7 @@
                    reset)))
 
 (define (main args)
-  (display (string-join (map tag-string tags) "")))
+  (let ((tags (->> (string-split (system-output "herbstclient tag_status")
+                                 char-whitespace?)
+                   (filter (lambda (s) (not (string-null? s)))))))
+    (display (string-join (map tag-string tags) ""))))
