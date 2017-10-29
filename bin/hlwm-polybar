@@ -69,9 +69,9 @@
     (when (curtag? tag)
           (set! bg (format-xresource 'B "date_background"))
           (set! u (format-xresource 'u (match status
-                                        ('free "faded_foreground")
-                                        ('urgent "color1")
-                                        ('occupied "foreground")))))
+                                              ('free "faded_foreground")
+                                              ('urgent "color1")
+                                              ('occupied "foreground")))))
     (match status
            ('free (set! fg (format-xresource 'F "faded_foreground")))
            ('urgent (begin
