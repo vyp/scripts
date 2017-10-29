@@ -55,14 +55,9 @@
          ('urgent "")
          ('occupied "")))
 
-(define (get-bg color)
-  (string-append "%{B" (assoc-ref polybar-xresources color) "}"))
-
-(define (get-fg color)
-  (string-append "%{F" (assoc-ref polybar-xresources color) "}"))
-
-(define (get-u color)
-  (string-append "%{u" (assoc-ref polybar-xresources color) "}"))
+(define (format-xresource type key)
+  (string-append "%{" (symbol->string type)
+                 (assoc-ref polybar-xresources key) "}"))
 
 (define (tag-string tag)
   (let ((padding "   ")
@@ -72,16 +67,16 @@
         (reset "%{B-}%{F-}%{u#00ffffff}")
         (status (tag-status tag)))
     (when (curtag? tag)
-          (set! bg (get-bg "date_background"))
-          (set! u (get-u (match status
-                                ('free "faded_foreground")
-                                ('urgent "color1")
-                                ('occupied "foreground")))))
+          (set! bg (format-xresource 'B "date_background"))
+          (set! u (format-xresource 'u (match status
+                                        ('free "faded_foreground")
+                                        ('urgent "color1")
+                                        ('occupied "foreground")))))
     (match status
-           ('free (set! fg (get-fg "faded_foreground")))
+           ('free (set! fg (format-xresource 'F "faded_foreground")))
            ('urgent (begin
-                      (set! fg (get-fg "color1"))
-                      (set! u (get-u "color1"))))
+                      (set! fg (format-xresource 'F "color1"))
+                      (set! u (format-xresource 'u "color1"))))
            (_ #t))
     (string-append bg fg u
                    padding
