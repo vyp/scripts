@@ -12,6 +12,11 @@
   (-> (system-output "herbstclient attr tags.focus.name")
       (string-trim-right #\newline)))
 
+(define clients
+  (-> (system-output "herbstclient attr tags.focus.client_count")
+      (string-trim-right #\newline)
+      (string->number)))
+
 (define tags
   (->> (string-split (system-output "herbstclient tag_status")
                      char-whitespace?)
@@ -38,7 +43,11 @@
   (string (string-ref tag 1)))
 
 (define (tag-status tag)
-  (string (string-ref tag 0)))
+  (match (string (string-ref tag 0))
+         ("!" 'urgent)
+         ("#" (if (zero? clients) 'free 'occupied))
+         (":" 'occupied)
+         ("." 'free)))
 
 (define (tag-name->icon name)
   (match name
@@ -54,13 +63,19 @@
          ("0" "")
          (_   "")))
 
-(define (set-bg color)
+(define (tag-status->icon status)
+  (match status
+         ('free "")
+         ('urgent "")
+         ('occupied "")))
+
+(define (get-bg color)
   (string-append "%{B" (assoc-ref xcolors color) "}"))
 
-(define (set-fg color)
+(define (get-fg color)
   (string-append "%{F" (assoc-ref xcolors color) "}"))
 
-(define (set-u color)
+(define (get-u color)
   (string-append "%{u" (assoc-ref xcolors color) "}"))
 
 (define (tag-string tag)
@@ -68,22 +83,24 @@
         (bg "")
         (fg "")
         (u "")
-        (reset "%{B-}%{F-}%{u#00ffffff}"))
-    (if (equal? (tag-name tag) curtag)
-        (begin
-          (set! bg (set-bg "date_background"))
-          (if (equal? (tag-status tag) "!")
-              (begin
-                (set! fg (set-fg "color1"))
-                (set! u (set-u "color1")))
-              (set! u (set-u "foreground"))))
-        (if (equal? (tag-status tag) "!")
-            (set! fg (set-fg "color1"))
-            (when (equal? (tag-status tag) ".")
-                  (set! fg (set-fg "faded_foreground")))))
+        (reset "%{B-}%{F-}%{u#00ffffff}")
+        (status (tag-status tag))
+        (curtag? (equal? (tag-name tag) curtag)))
+    (when curtag?
+          (set! bg (get-bg "date_background"))
+          (set! u (get-u (match status
+                                ('free "faded_foreground")
+                                ('urgent "color1")
+                                ('occupied "foreground")))))
+    (match status
+           ('free (set! fg (get-fg "faded_foreground")))
+           ('urgent (begin
+                      (set! fg (get-fg "color1"))
+                      (set! u (get-u "color1"))))
+           (_ #t))
     (string-append bg fg u
                    padding
-                   (tag-name->icon (tag-name tag))
+                   (tag-status->icon status)
                    padding
                    reset)))
 
