@@ -8,13 +8,6 @@
 (use-modules (ice-9 match))
 (use-modules (srfi srfi-1))
 
-;; Faster to define this globally just once even though it's only used in
-;; `tag-status'.
-(define clients
-  (-> (system-output "herbstclient attr tags.focus.client_count")
-      (string-trim-right #\newline)
-      (string->number)))
-
 (define (xcolor-name xresource)
   (substring xresource
              (+ 1 (string-index xresource #\.))
@@ -24,6 +17,8 @@
   (->> (substring xresource (+ 1 (string-index xresource #\:)))
        (string-trim-both)))
 
+;; Faster to define these globally just once, rather than have to recalculate
+;; them over and over each time they need to be checked/used.
 (define xcolors
   (->> (string-split (system-output "xrdb -query")
                      (lambda (c) (char=? c #\newline)))
@@ -32,13 +27,20 @@
                (acons (xcolor-name xresource)
                       (xcolor-value xresource) alist)) '())))
 
+(define clients
+  (-> (system-output "herbstclient attr tags.focus.client_count")
+      (string-trim-right #\newline)
+      (string->number)))
+
+(define curtag
+  (-> (system-output "herbstclient attr tags.focus.name")
+      (string-trim-right #\newline)))
+
 (define (tag-name tag)
   (string (string-ref tag 1)))
 
 (define (curtag? tag)
-  (let ((curtag (-> (system-output "herbstclient attr tags.focus.name")
-                    (string-trim-right #\newline))))
-    (equal? (tag-name tag) curtag)))
+  (equal? (tag-name tag) curtag))
 
 (define (tag-status tag)
   (match (string (string-ref tag 0))
