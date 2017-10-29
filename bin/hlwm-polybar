@@ -2,11 +2,11 @@
 -e main -s
 !#
 
-(use-modules (personal scripting))
-(use-modules (site pipe))
-
 (use-modules (ice-9 match))
 (use-modules (srfi srfi-1))
+
+(use-modules (personal scripting))
+(use-modules (site pipe))
 
 (define (xresource-name xresource)
   (substring xresource
