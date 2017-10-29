@@ -8,24 +8,24 @@
 (use-modules (ice-9 match))
 (use-modules (srfi srfi-1))
 
-(define (xcolor-name xresource)
+(define (xresource-name xresource)
   (substring xresource
              (+ 1 (string-index xresource #\.))
              (string-index xresource #\:)))
 
-(define (xcolor-value xresource)
+(define (xresource-value xresource)
   (->> (substring xresource (+ 1 (string-index xresource #\:)))
        (string-trim-both)))
 
 ;; Faster to define these globally just once, rather than have to recalculate
 ;; them over and over each time they need to be checked/used.
-(define xcolors
+(define polybar-xresources
   (->> (string-split (system-output "xrdb -query")
                      (lambda (c) (char=? c #\newline)))
        (filter (lambda (xresource) (string-prefix? "polybar." xresource)))
        (fold (lambda (xresource alist)
-               (acons (xcolor-name xresource)
-                      (xcolor-value xresource) alist)) '())))
+               (acons (xresource-name xresource)
+                      (xresource-value xresource) alist)) '())))
 
 (define clients
   (-> (system-output "herbstclient attr tags.focus.client_count")
@@ -56,13 +56,13 @@
          ('occupied "")))
 
 (define (get-bg color)
-  (string-append "%{B" (assoc-ref xcolors color) "}"))
+  (string-append "%{B" (assoc-ref polybar-xresources color) "}"))
 
 (define (get-fg color)
-  (string-append "%{F" (assoc-ref xcolors color) "}"))
+  (string-append "%{F" (assoc-ref polybar-xresources color) "}"))
 
 (define (get-u color)
-  (string-append "%{u" (assoc-ref xcolors color) "}"))
+  (string-append "%{u" (assoc-ref polybar-xresources color) "}"))
 
 (define (tag-string tag)
   (let ((padding "   ")
