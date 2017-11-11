@@ -2,11 +2,11 @@
 -e main -s
 !#
 
-(use-modules (ice-9 match))
-(use-modules (srfi srfi-1))
-
-(use-modules (scripting))
-(use-modules (pipe))
+(use-modules (ice-9 match)
+             (srfi srfi-1)
+             (scripting)
+             (hlwm)
+             (pipe))
 
 (define (xresource-name xresource)
   (substring xresource
@@ -28,26 +28,10 @@
                       (xresource-value xresource) alist)) '())))
 
 (define curtag-clients
-  (-> (system-output "herbstclient attr tags.focus.client_count")
-      (string-trim-right #\newline)
+  (-> (hlwm-attr "tags.focus.client_count")
       (string->number)))
 
-(define curtag-name
-  (-> (system-output "herbstclient attr tags.focus.name")
-      (string-trim-right #\newline)))
-
-(define (tag-name tag)
-  (string (string-ref tag 1)))
-
-(define (curtag? tag)
-  (equal? (tag-name tag) curtag-name))
-
-(define (tag-status tag)
-  (match (string (string-ref tag 0))
-         ("!" 'urgent)
-         ("#" (if (zero? curtag-clients) 'free 'occupied))
-         (":" 'occupied)
-         ("." 'free)))
+(define curtag-name (hlwm-curtag-name))
 
 (define (tag-status->icon status)
   (match status
@@ -65,8 +49,8 @@
         (fg "")
         (u "")
         (reset "%{B-}%{F-}%{u#00ffffff}")
-        (status (tag-status tag)))
-    (when (curtag? tag)
+        (status (hlwm-tag-status tag curtag-clients)))
+    (when (equal? (hlwm-tag-name tag) curtag-name)
           (set! bg (format-xresource 'B "date_background"))
           (set! u (format-xresource 'u (match status
                                               ('free "faded_foreground")
@@ -85,7 +69,4 @@
                    reset)))
 
 (define (main args)
-  (let ((tags (->> (string-split (system-output "herbstclient tag_status")
-                                 char-whitespace?)
-                   (filter (lambda (s) (not (string-null? s)))))))
-    (display (string-join (map tag-string tags) ""))))
+  (display (string-join (map tag-string (hlwm-tags)) "")))
