@@ -29,8 +29,8 @@
 (define-public (hlwm-tag-name tag)
   (string (string-ref tag 1)))
 
-(define-public (hlwm-curtag? tag)
-  (equal? (hlwm-tag-name tag) (hlwm-curtag-name)))
+(define*-public (hlwm-curtag? tag #:optional (curtag-name (hlwm-curtag-name)))
+  (equal? (hlwm-tag-name tag) curtag-name))
 
 (define-public (hlwm-tag-name->index tag)
   (-> (hlwm-attr (string-append "tags.by-name." (hlwm-tag-name tag) ".index"))

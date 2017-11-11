@@ -20,15 +20,16 @@
                    (number->string)))))
 
 (define (main args)
-  (let* ((action (cadr args))
-         (type (string->symbol (caddr args)))
-         (tags (hlwm-tags))
-         (curpos (list-index hlwm-curtag? tags))
+  (let* ((tags (hlwm-tags))
+         (curtag-name (hlwm-curtag-name))
+         (curpos (list-index
+                  (lambda (tag)
+                    (hlwm-curtag? tag curtag-name)) tags))
          (prev (list-head tags curpos))
          (next (list-tail tags (+ 1 curpos))))
     (tag-action
-     action
-     (tag-next type
+     (cadr args)
+     (tag-next (string->symbol (caddr args))
                (map (lambda (tag)
                       (if (equal? (hlwm-tag-status tag) 'urgent)
                           (string-append ":" (hlwm-tag-name tag)) tag))

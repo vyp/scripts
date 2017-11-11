@@ -50,7 +50,7 @@
         (u "")
         (reset "%{B-}%{F-}%{u#00ffffff}")
         (status (hlwm-tag-status tag curtag-clients)))
-    (when (equal? (hlwm-tag-name tag) curtag-name)
+    (when (hlwm-curtag? tag curtag-name)
           (set! bg (format-xresource 'B "date_background"))
           (set! u (format-xresource 'u (match status
                                               ('free "faded_foreground")
