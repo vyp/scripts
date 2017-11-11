@@ -10,9 +10,9 @@
 ;;
 ;; (Optionally) Also uses $EDITOR, mpv and mpc.
 
-(use-modules (personal scripting)
-             (personal string)
-             (site pipe)
+(use-modules (scripting)
+             (string)
+             (pipe)
              (ice-9 ftw)
              (ice-9 match)
              (ice-9 readline)
@@ -29,6 +29,15 @@
                     (granting  . ,(home-path "music/store/status/granting"))
                     (available . ,(home-path "music/store/status/available"))
                     (importing . ,(home-path "music/store/status/importing"))))
+
+(define (first-word str)
+  (let ((multiple-words? (string-index str #\space)))
+    (if multiple-words?
+        (substring str 0 multiple-words?)
+        str)))
+
+(define (first-words contents)
+  (map first-word contents))
 
 (define (flock-store mode)
   (flocks mode

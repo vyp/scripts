@@ -1,4 +1,4 @@
-(define-module (site pipe)
+(define-module (pipe)
   #:export (-> ->>))
 
 ;; Thread first macro.

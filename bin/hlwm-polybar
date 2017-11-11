@@ -5,8 +5,8 @@
 (use-modules (ice-9 match))
 (use-modules (srfi srfi-1))
 
-(use-modules (personal scripting))
-(use-modules (site pipe))
+(use-modules (scripting))
+(use-modules (pipe))
 
 (define (xresource-name xresource)
   (substring xresource
