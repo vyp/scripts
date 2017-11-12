@@ -2,6 +2,9 @@ Various small utility scripts for my `$PATH` under the `bin` directory. Some of
 them may be fairly reusable as is for others, whereas other scripts may be very
 specific to my setup 👉 [vyp/dots].
 
+Note that the guile scripts require `lib/guile` to be under `$GUILE_LOAD_PATH`
+(or otherwise installed somehow).
+
 # hlwm-polybar
 
 A script to show focused, occupied, free and urgent herbstluftwm tags in polybar
