@@ -4,7 +4,8 @@
   #:use-module (ice-9 popen)
   #:use-module (ice-9 rdelim)
   #:use-module (rnrs sorting)
-  #:use-module (srfi srfi-1))
+  #:use-module (srfi srfi-1)
+  #:use-module (pipe))
 
 (define-public (bell)
   (system* "echo" "-e" "\a"))
@@ -51,26 +52,25 @@
   (string-append (getenv "HOME") "/" path))
 
 (define-public (read-file file)
-  ((lambda (lst) (with-input-from-file file
+  ((lambda (ls) (with-input-from-file file
               (lambda () (do ((line (read-line) (read-line)))
                         ((eof-object? line))
-                      (set! lst (cons line lst)))
-                 (reverse lst)))) '()))
+                      (set! ls (cons line ls)))
+                 (reverse ls)))) '()))
 
 (define-public (read-lines port)
-  ((lambda (lst)
+  ((lambda (ls)
      (do ((line (read-line port) (read-line port)))
          ((eof-object? line))
-       (set! lst (cons line lst)))
-     (reverse lst)) '()))
+       (set! ls (cons line ls)))
+     (reverse ls)) '()))
 
-;; I'm not sure if this actually works, shouldn't `read-lines' take a port, not
-;; a file[name]?
 (define-public (sort-file file)
-  (call-with-output-file file
-    (lambda (out) (display (-> (read-lines file)
-                          (lambda (ls) (list-sort string<? ls))
-                          (string-join "\n" 'suffix)) out))))
+  ((lambda (file-contents)
+     (call-with-output-file file
+       (lambda (out) (display (-> (list-sort string<? file-contents)
+                             (string-join "\n" 'suffix)) out))))
+   (read-file file)))
 
 (define-public (system-output command)
   (let* ((port (open-input-pipe command))
