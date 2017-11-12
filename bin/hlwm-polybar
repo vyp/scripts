@@ -4,7 +4,7 @@
 
 (use-modules (ice-9 match)
              (srfi srfi-1)
-             (scripting)
+             (shell)
              (hlwm)
              (pipe))
 

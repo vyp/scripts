@@ -1,7 +1,7 @@
 (define-module (hlwm)
   #:use-module (ice-9 match)
   #:use-module (ice-9 optargs)
-  #:use-module (scripting)
+  #:use-module (shell)
   #:use-module (pipe))
 
 (define-public (hlwm-attr attr)
