@@ -12,11 +12,13 @@
   (->> (string-split (system-output "herbstclient tag_status") char-whitespace?)
        (filter (lambda (s) (not (string-null? s))))))
 
+(define-public (hlwm-curtag-clients)
+  (-> (hlwm-attr "tags.focus.client_count")
+      (string->number)))
+
 (define*-public (hlwm-tag-status
                  tag
-                 #:optional (curtag-clients
-                             (-> (hlwm-attr "tags.focus.client_count")
-                                 (string->number))))
+                 #:optional (curtag-clients (hlwm-curtag-clients)))
   (match (string (string-ref tag 0))
          ("!" 'urgent)
          ("#" (if (zero? curtag-clients) 'free 'occupied))

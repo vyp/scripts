@@ -27,10 +27,7 @@
                (acons (xresource-name xresource)
                       (xresource-value xresource) alist)) '())))
 
-(define curtag-clients
-  (-> (hlwm-attr "tags.focus.client_count")
-      (string->number)))
-
+(define curtag-clients (hlwm-curtag-clients))
 (define curtag-name (hlwm-curtag-name))
 
 (define (tag-status->icon status)
@@ -58,9 +55,8 @@
                                               ('occupied "foreground")))))
     (match status
            ('free (set! fg (format-xresource 'F "faded_foreground")))
-           ('urgent (begin
-                      (set! fg (format-xresource 'F "color1"))
-                      (set! u (format-xresource 'u "color1"))))
+           ('urgent (begin (set! fg (format-xresource 'F "color1"))
+                           (set! u (format-xresource 'u "color1"))))
            (_ #t))
     (string-append bg fg u
                    padding
