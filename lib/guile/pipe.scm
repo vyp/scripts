@@ -1,7 +1,8 @@
 (define-module (pipe)
   #:export (-> ->>))
 
-;; Thread first macro.
+;; Thread First Macro
+;; ==================
 ;;
 ;; The first s-expression will be inserted as the first argument of the next
 ;; s-expesssion.
@@ -17,7 +18,8 @@
     ((_ x (f . (f-rest ...)) rest ...) (-> (f x f-rest ...) rest ...))
     ((_ x f rest ...) (-> (f x) rest ...))))
 
-;; Thread last macro.
+;; Thread Last Macro
+;; =================
 ;;
 ;; The first s-expression will be inserted as the last argument of the next
 ;; s-expesssion.

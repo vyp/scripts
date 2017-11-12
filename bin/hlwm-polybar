@@ -4,9 +4,7 @@
 
 (use-modules (ice-9 match)
              (srfi srfi-1)
-             (shell)
-             (hlwm)
-             (pipe))
+             (shell) (hlwm) (pipe))
 
 (define (xresource-name xresource)
   (substring xresource
@@ -41,10 +39,7 @@
                  (assoc-ref polybar-xresources key) "}"))
 
 (define (tag-string tag)
-  (let ((padding "   ")
-        (bg "")
-        (fg "")
-        (u "")
+  (let ((padding "   ") (bg "") (fg "") (u "")
         (reset "%{B-}%{F-}%{u#00ffffff}")
         (status (hlwm-tag-status tag curtag-clients)))
     (when (hlwm-curtag? tag curtag-name)
@@ -58,11 +53,7 @@
            ('urgent (begin (set! fg (format-xresource 'F "color1"))
                            (set! u (format-xresource 'u "color1"))))
            (_ #t))
-    (string-append bg fg u
-                   padding
-                   (tag-status->icon status)
-                   padding
-                   reset)))
+    (string-append bg fg u padding (tag-status->icon status) padding reset)))
 
 (define (main args)
   (display (string-join (map tag-string (hlwm-tags)) "")))

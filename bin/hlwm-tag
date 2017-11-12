@@ -3,11 +3,12 @@
 !#
 
 (use-modules (srfi srfi-1)
-             (hlwm)
-             (pipe))
+             (hlwm) (pipe))
+
+(define curtag-clients (hlwm-curtag-clients))
 
 (define (tag-next type tags)
-  (find (lambda (tag) (equal? (hlwm-tag-status tag) type))
+  (find (lambda (tag) (equal? (hlwm-tag-status tag curtag-clients) type))
         tags))
 
 (define (tag-action action tag)
@@ -32,6 +33,7 @@
                ;; Make all urgent tags 'occupied' instead (":" is the character
                ;; used to signify occupied status), so that `tag-next' doesn't
                ;; have to worry about it.
-               (map (lambda (tag) (if (equal? (hlwm-tag-status tag) 'urgent)
-                                 (string-append ":" (hlwm-tag-name tag)) tag))
+               (map (lambda (tag)
+                      (if (equal? (hlwm-tag-status tag curtag-clients) 'urgent)
+                          (string-append ":" (hlwm-tag-name tag)) tag))
                     (append next prev))))))
