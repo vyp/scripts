@@ -23,14 +23,15 @@
   (let* ((tags (hlwm-tags))
          (curtag-name (hlwm-curtag-name))
          (curpos (list-index
-                  (lambda (tag)
-                    (hlwm-curtag? tag curtag-name)) tags))
+                  (lambda (tag) (hlwm-curtag? tag curtag-name)) tags))
          (prev (list-head tags curpos))
          (next (list-tail tags (+ 1 curpos))))
     (tag-action
      (cadr args)
      (tag-next (string->symbol (caddr args))
-               (map (lambda (tag)
-                      (if (equal? (hlwm-tag-status tag) 'urgent)
-                          (string-append ":" (hlwm-tag-name tag)) tag))
+               ;; Make all urgent tags 'occupied' instead (":" is the character
+               ;; used to signify occupied status), so that `tag-next' doesn't
+               ;; have to worry about it.
+               (map (lambda (tag) (if (equal? (hlwm-tag-status tag) 'urgent)
+                                 (string-append ":" (hlwm-tag-name tag)) tag))
                     (append next prev))))))
