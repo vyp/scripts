@@ -17,8 +17,11 @@
          (when (file-exists? file)
            (delete-file file))) files))
 
-(define-public (edit . files)
-  (system (string-append (getenv "EDITOR") " " (string-join files))))
+(define (editor)
+  ((lambda (e) (if (string-null? e) "nano" e)) (getenv "EDITOR")))
+
+(define-public (edit-files . files)
+  (system (string-append (editor) " " (string-join files))))
 
 (define-public (mkdir-p . dirs)
   (map (lambda (dir)
