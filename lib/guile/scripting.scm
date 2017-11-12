@@ -9,7 +9,7 @@
 (define-public (bell)
   (system* "echo" "-e" "\a"))
 
-(define-public (close-ports ports)
+(define-public (close-ports . ports)
   (map close-port ports))
 
 (define-public (delete-files . files)
