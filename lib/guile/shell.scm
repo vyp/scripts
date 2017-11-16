@@ -65,6 +65,14 @@
        (set! ls (cons line ls)))
      (reverse ls)) '()))
 
+(define-public (flock-read-file file)
+  ((lambda (port)
+     (flock port LOCK_EX)
+     ((lambda (file-contents)
+        (close-port port) file-contents)
+      (read-lines port)))
+   (open-file file "r")))
+
 (define-public (sort-file file)
   ((lambda (file-contents)
      (call-with-output-file file
