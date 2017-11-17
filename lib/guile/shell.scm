@@ -39,6 +39,14 @@
    (open-file file "a")))
 
 (define-public (file-read file)
+  ((lambda (port)
+     ((lambda (exp)
+        (close-port port)
+        exp)
+      (read port)))
+   (open-file file "r")))
+
+(define-public (file-string-read file)
   ((lambda (ls) (with-input-from-file file
               (lambda () (do ((line (read-line) (read-line)))
                         ((eof-object? line))
@@ -50,7 +58,7 @@
      (call-with-output-file file
        (lambda (out) (display (-> (list-sort string<? file-contents)
                              (string-join "\n" 'suffix)) out))))
-   (file-read file)))
+   (file-string-read file)))
 
 (define-public (port-string-read port)
   ((lambda (ls)
