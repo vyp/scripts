@@ -32,11 +32,40 @@
   (mkdir-p dir)
   (chdir dir))
 
-(define-public (file-append file text)
+(define-public (file-append-text file text)
   ((lambda (port)
      (display text port)
      (close-port port))
    (open-file file "a")))
+
+(define-public (file-read file)
+  ((lambda (ls) (with-input-from-file file
+              (lambda () (do ((line (read-line) (read-line)))
+                        ((eof-object? line))
+                      (set! ls (cons line ls)))
+                 (reverse ls)))) '()))
+
+(define-public (file-sort file)
+  ((lambda (file-contents)
+     (call-with-output-file file
+       (lambda (out) (display (-> (list-sort string<? file-contents)
+                             (string-join "\n" 'suffix)) out))))
+   (file-read file)))
+
+(define-public (port-string-read port)
+  ((lambda (ls)
+     (do ((line (read-line port) (read-line port)))
+         ((eof-object? line))
+       (set! ls (cons line ls)))
+     (reverse ls)) '()))
+
+(define-public (flock-file-read file)
+  ((lambda (port)
+     (flock port LOCK_EX)
+     ((lambda (file-contents)
+        (close-port port) file-contents)
+      (port-string-read port)))
+   (open-file file "r")))
 
 (define remove-stat-from-file-system-tree
   (match-lambda
@@ -50,35 +79,6 @@
 
 (define-public (home-path path)
   (string-append (getenv "HOME") "/" path))
-
-(define-public (read-file file)
-  ((lambda (ls) (with-input-from-file file
-              (lambda () (do ((line (read-line) (read-line)))
-                        ((eof-object? line))
-                      (set! ls (cons line ls)))
-                 (reverse ls)))) '()))
-
-(define-public (read-lines port)
-  ((lambda (ls)
-     (do ((line (read-line port) (read-line port)))
-         ((eof-object? line))
-       (set! ls (cons line ls)))
-     (reverse ls)) '()))
-
-(define-public (flock-read-file file)
-  ((lambda (port)
-     (flock port LOCK_EX)
-     ((lambda (file-contents)
-        (close-port port) file-contents)
-      (read-lines port)))
-   (open-file file "r")))
-
-(define-public (sort-file file)
-  ((lambda (file-contents)
-     (call-with-output-file file
-       (lambda (out) (display (-> (list-sort string<? file-contents)
-                             (string-join "\n" 'suffix)) out))))
-   (read-file file)))
 
 (define-public (system-output command)
   (let* ((port (open-input-pipe command))
