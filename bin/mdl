@@ -1,0 +1,12 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i 'guile -e main' -p guile nano ffmpeg mpv atomicparsley youtube-dl
+!#
+
+(define (main args)
+  (map (lambda (arg) (display arg) (display " "))
+       (cdr args))
+  (newline))
+
+; Local Variables:
+; mode: scheme
+; End:
