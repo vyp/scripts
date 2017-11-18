@@ -101,4 +101,4 @@
                          ((lambda (port)
                             (display "" port)
                             (close-port port))
-                          (open-file file "w"))) files)))
+                          (open-file file "w")))) files))
