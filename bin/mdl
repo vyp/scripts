@@ -19,6 +19,7 @@
      (flock port LOCK_EX)
      ((lambda (status)
         (seek port 0 SEEK_SET)
+        (truncate-file port)
         (cons status port))
       (read port)))
    (open-file status-file "r+")))
