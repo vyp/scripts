@@ -2,10 +2,49 @@
 #! nix-shell -i 'guile -e main' -p guile nano ffmpeg mpv atomicparsley youtube-dl
 !#
 
+(use-modules (ice-9 pretty-print)
+             (ice-9 match)
+             (alist) (shell) (pipe))
+
+(define store         (home-path "music/store"))
+(define lib           (home-path "music/lib"))
+(define playlists-dir (home-path "music/playlists"))
+(define status-file   (string-append store "/status.scm"))
+
+(define (args->song args)
+  `((url . ,(cadr args))))
+
+(define (current-status)
+  ((lambda (port)
+     (flock port LOCK_EX)
+     ((lambda (status)
+        (seek port 0 SEEK_SET)
+        (cons status port))
+      (read port)))
+   (open-file status-file "r+")))
+
+(define (status-add status ls song)
+  (assoc-replace status ls (-> (assoc-ref status ls)
+                               (append (list song)))))
+
+(define (status-remove status ls song)
+  (assoc-replace status ls (->> (assoc-ref status ls)
+                                (delete song))))
+
+(define (update-status status port)
+  (pretty-print status port)
+  (close-port port))
+
 (define (main args)
-  (map (lambda (arg) (display arg) (display " "))
-       (cdr args))
-  (newline))
+  (mkdir-p store lib playlists-dir)
+  (touch-files status-file)
+  (if (> (length args) 1)
+      (let* ((curstatus (current-status))
+             (status (car curstatus))
+             (port (cdr curstatus)))
+        (-> (status-add status 'wishlist (args->song args))
+            (update-status port)))
+      (display "dl")))
 
 ; Local Variables:
 ; mode: scheme
