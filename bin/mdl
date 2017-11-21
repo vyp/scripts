@@ -4,6 +4,7 @@
 
 (use-modules (ice-9 pretty-print)
              (ice-9 match)
+             (srfi srfi-1)
              (alist) (shell) (pipe))
 
 (define store         (home-path "music/store"))
@@ -12,7 +13,12 @@
 (define status-file   (string-append store "/status.scm"))
 
 (define (args->song args)
-  `((url . ,(cadr args))))
+  (let* ((playlists (cddr args))
+         (ratings (filter string->number playlists))
+         (rating (if (null? ratings) #f (car ratings))))
+    (->> (acons 'playlists (lset-difference equal? playlists ratings) '())
+         (acons 'rating rating)
+         (acons 'url (cadr args)))))
 
 (define (current-status)
   ((lambda (port)
