@@ -41,8 +41,7 @@
 (define-public (file-read file)
   ((lambda (port)
      ((lambda (exp)
-        (close-port port)
-        exp)
+        (close-port port) exp)
       (read port)))
    (open-file file "r")))
 
