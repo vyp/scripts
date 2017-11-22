@@ -38,9 +38,40 @@
   (assoc-replace status ls (->> (assoc-ref status ls)
                                 (delete song))))
 
+(define (status-replace status ls old-song new-song)
+  (-> (status-remove status ls old-song)
+      (status-add ls new-song)))
+
 (define (update-status status port)
   (pretty-print status port)
   (close-port port))
+
+(define (get-title song)
+  (assoc-replace
+   song 'title (-> (string-append "youtube-dl --get-title '"
+                                  (assoc-ref song 'url) "'")
+                   (system-output)
+                   (string-trim-right #\newline))))
+
+
+(define (find-same-song status-list ref-song)
+  (-> (filter (lambda (song) (equal? (assoc-ref song 'url)
+                                (assoc-ref ref-song 'url))) status-list)
+      (car)))
+
+(define (retrieve-missing-titles)
+  (let* ((curstatus (current-status))
+         (status (car curstatus))
+         (port (cdr curstatus)))
+    (->> (assoc-ref status 'wishlist)
+         (filter (lambda (song) (equal? #f (assoc-ref song 'title))))
+         (map get-title)
+         (fold
+          (lambda (song alist)
+            (status-replace
+             alist 'wishlist (find-same-song (assoc-ref alist 'wishlist) song)
+             song)) status)
+         ((lambda (alist) (update-status alist port))))))
 
 (define (main args)
   (mkdir-p store lib playlists-dir)
@@ -51,7 +82,7 @@
              (port (cdr curstatus)))
         (-> (status-add status 'wishlist (args->song args))
             (update-status port)))
-      (display "dl")))
+      (retrieve-missing-titles)))
 
 ; Local Variables:
 ; mode: scheme
