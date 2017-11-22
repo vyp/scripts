@@ -66,7 +66,7 @@
        (set! ls (cons line ls)))
      (reverse ls)) '()))
 
-(define-public (flock-file-read file)
+(define-public (flock-file-string-read file)
   ((lambda (port)
      (flock port LOCK_EX)
      ((lambda (file-contents)
