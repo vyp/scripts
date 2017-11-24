@@ -55,9 +55,9 @@
 
 
 (define (find-same-song status-list ref-song)
-  (-> (filter (lambda (song) (equal? (assoc-ref song 'url)
-                                (assoc-ref ref-song 'url))) status-list)
-      (car)))
+  (->> status-list
+       (find (lambda (song) (equal? (assoc-ref song 'url)
+                               (assoc-ref ref-song 'url))))))
 
 (define (retrieve-missing-titles)
   (let* ((curstatus (current-status))
