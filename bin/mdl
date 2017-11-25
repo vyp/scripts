@@ -78,8 +78,8 @@
          (fold
           (lambda (song alist)
             (status-replace
-             alist 'wishlist (find-same-song (assoc-ref alist 'wishlist) song)
-             song)) status)
+             alist 'wishlist
+             (find-same-song (assoc-ref alist 'wishlist) song) song)) status)
          ((lambda (alist) (update-status alist port))))))
 
 (define (main args)
