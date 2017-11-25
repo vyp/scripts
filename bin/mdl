@@ -26,8 +26,6 @@
   ((lambda (port)
      (flock port LOCK_EX)
      ((lambda (status)
-        (seek port 0 SEEK_SET)
-        (truncate-file port)
         (cons status port))
       (read port)))
    (open-file status-file "r+")))
@@ -47,6 +45,8 @@
       (status-add ls new-song)))
 
 (define (update-status status port)
+  (seek port 0 SEEK_SET)
+  (truncate-file port)
   (pretty-print status port)
   (close-port port))
 
