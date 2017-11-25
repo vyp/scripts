@@ -5,7 +5,7 @@
 (use-modules (ice-9 pretty-print)
              (ice-9 match)
              (srfi srfi-1)
-             (alist) (shell) (pipe))
+             (alist) (string) (shell) (pipe))
 
 (define store         (home-path "music/store"))
 (define lib           (home-path "music/lib"))
@@ -53,6 +53,12 @@
                    (system-output)
                    (string-trim-right #\newline))))
 
+(define (derive-potential-artist-and-track song)
+  ((lambda (title-split)
+     (->> song
+          (acons 'track (if title-split (cadr title-split) #f))
+          (acons 'artist (if title-split (car title-split) #f))))
+   (string-substring-split (assoc-ref song 'title) " - ")))
 
 (define (find-same-song status-list ref-song)
   (->> status-list
@@ -66,6 +72,7 @@
     (->> (assoc-ref status 'wishlist)
          (filter (lambda (song) (equal? #f (assoc-ref song 'title))))
          (map get-title)
+         (map derive-potential-artist-and-track)
          (fold
           (lambda (song alist)
             (status-replace
