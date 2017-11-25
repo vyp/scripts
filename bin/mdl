@@ -1,6 +1,7 @@
 #! /usr/bin/env nix-shell
 #! nix-shell -i 'guile -e main' -p guile nano ffmpeg mpv atomicparsley youtube-dl
 !#
+;; vim: ft=scheme
 
 (use-modules (ice-9 pretty-print)
              (ice-9 match)
@@ -94,6 +95,6 @@
             (update-status port)))
       (retrieve-missing-titles)))
 
-; Local Variables:
-; mode: scheme
-; End:
+;; Local Variables:
+;; mode: scheme
+;; End:
