@@ -6,8 +6,8 @@
              (ice-9 match)
              (srfi srfi-1)
              (alist-utils)
-             (string-utils)
-             (io) (pipe))
+             (io-helpers)
+             (pipe) (string-utils))
 
 (define store         (home-path "music/store"))
 (define lib           (home-path "music/lib"))
