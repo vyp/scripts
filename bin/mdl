@@ -33,12 +33,14 @@
    (open-file status-file "r+")))
 
 (define (status-add status ls song)
-  (assoc-replace status ls (-> (assoc-ref status ls)
-                               (append (list song)))))
+  (-> (assoc-ref status ls)
+      (append (list song))
+      ((lambda (value) (assoc-replace ls value status)))))
 
 (define (status-remove status ls song)
-  (assoc-replace status ls (->> (assoc-ref status ls)
-                                (delete song))))
+  (->> (assoc-ref status ls)
+       (delete song)
+       ((lambda (value) (assoc-replace ls value status)))))
 
 (define (status-replace status ls old-song new-song)
   (-> (status-remove status ls old-song)
@@ -49,11 +51,10 @@
   (close-port port))
 
 (define (get-title song)
-  (assoc-replace
-   song 'title (-> (string-append "youtube-dl --get-title '"
-                                  (assoc-ref song 'url) "'")
-                   (system-output)
-                   (string-trim-right #\newline))))
+  (-> (string-append "youtube-dl --get-title '" (assoc-ref song 'url) "'")
+      (system-output)
+      (string-trim-right #\newline)
+      ((lambda (value) (assoc-replace 'title value song)))))
 
 (define (derive-potential-artist-and-track song)
   ((lambda (title-split)
