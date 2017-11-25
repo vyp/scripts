@@ -20,6 +20,12 @@
                (-> (hlwm-tag-name->index tag)
                    (number->string)))))
 
+(define (tag-urgent->occupied tag)
+  (if (equal? (hlwm-tag-status tag curtag-clients) 'urgent)
+      ;; ":" is the character used by herbstluftwm to signify occupied status.
+      (string-append ":" (hlwm-tag-name tag))
+      tag))
+
 (define (main args)
   (let* ((tags (hlwm-tags))
          (curtag-name (hlwm-curtag-name))
@@ -27,13 +33,9 @@
                   (lambda (tag) (hlwm-curtag? tag curtag-name)) tags))
          (prev (list-head tags curpos))
          (next (list-tail tags (+ 1 curpos))))
-    (tag-action
-     (cadr args)
-     (tag-next (string->symbol (caddr args))
-               ;; Make all urgent tags 'occupied' instead (":" is the character
-               ;; used to signify occupied status), so that `tag-next' doesn't
-               ;; have to worry about it.
-               (map (lambda (tag)
-                      (if (equal? (hlwm-tag-status tag curtag-clients) 'urgent)
-                          (string-append ":" (hlwm-tag-name tag)) tag))
-                    (append next prev))))))
+    (->> (append next prev)
+         ;; Done so that `tag-next' doesn't have to worry about processing
+         ;; urgent tags.
+         (map tag-urgent->occupied)
+         (tag-next (string->symbol (caddr args)))
+         (tag-action (cadr args)))))
