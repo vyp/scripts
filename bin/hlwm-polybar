@@ -17,7 +17,7 @@
        (string-trim-both)))
 
 ;; Faster to define these globally just once, rather than have to recalculate
-;; them over and over each time they need to be checked/used.
+;; them over and over each time they need to be checked or used.
 (define polybar-xresources
   (->> (string-split (system-output "xrdb -query")
                      (lambda (c) (char=? c #\newline)))
