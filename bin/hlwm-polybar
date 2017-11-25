@@ -4,7 +4,7 @@
 
 (use-modules (ice-9 match)
              (srfi srfi-1)
-             (shell) (hlwm) (pipe))
+             (hlwm) (io) (pipe))
 
 (define (xresource-name xresource)
   (substring xresource

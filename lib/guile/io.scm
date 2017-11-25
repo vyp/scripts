@@ -1,4 +1,4 @@
-(define-module (shell)
+(define-module (io)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
   #:use-module (ice-9 popen)

@@ -1,4 +1,4 @@
-(define-module (string))
+(define-module (string-utils))
 
 ;; Note that this only splits on the first occurrence of the substring, instead
 ;; of every occurrence like it probably should based on its name.

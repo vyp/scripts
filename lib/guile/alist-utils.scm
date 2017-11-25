@@ -1,4 +1,4 @@
-(define-module (alist))
+(define-module (alist-utils))
 
 (define-public (assoc-remove alist key)
   (delete (assoc key alist) alist))

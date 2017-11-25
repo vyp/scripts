@@ -5,7 +5,9 @@
 (use-modules (ice-9 pretty-print)
              (ice-9 match)
              (srfi srfi-1)
-             (alist) (string) (shell) (pipe))
+             (alist-utils)
+             (string-utils)
+             (io) (pipe))
 
 (define store         (home-path "music/store"))
 (define lib           (home-path "music/lib"))
