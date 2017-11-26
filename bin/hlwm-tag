@@ -28,7 +28,9 @@
 
 (define (main args)
   (let* ((tags (hlwm-tags))
-         (curpos (list-index hlwm-curtag? tags))
+         (curtag-name (hlwm-curtag-name))
+         (curpos (list-index (lambda (tag) (hlwm-curtag? tag curtag-name))
+                             tags))
          (tags-before-curtag (list-head tags curpos))
          (tags-after-curtag (list-tail tags (+ 1 curpos))))
     (->> (append tags-after-curtag tags-before-curtag)
