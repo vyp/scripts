@@ -45,6 +45,7 @@
   (-> (status-remove status ls old-song)
       (status-add ls new-song)))
 
+;; TODO: Switch status and port argument order.
 (define (update-status status port)
   (seek port 0 SEEK_SET)
   (truncate-file port)
@@ -84,6 +85,31 @@
              (find-same-song (assoc-ref alist 'wishlist) song) song)) status)
          ((lambda (alist) (update-status alist port))))))
 
+(define (find-new-dir-from candidate)
+  ((lambda (dir)
+     (if (file-exists? dir)
+         (find-new-dir-from (+ 1 candidate))
+         dir))
+   (number->string candidate)))
+
+(define (dl song)
+  (chdir store)
+  ((lambda (storage-location)
+     (enter-dir storage-location)
+     (system* "youtube-dl" "-f" "140" (assoc-ref song 'url))
+     (acons 'storage-location storage-location song))
+   (find-new-dir-from 1)))
+
+(define (grant-wishes)
+  (let* ((curstatus (current-status))
+         (status (car curstatus))
+         (port (cdr curstatus)))
+    (->> (assoc-ref status 'wishlist)
+         (map dl)
+         (fold (lambda (song alist) (status-add alist 'available song)) status)
+         (assoc-replace 'wishlist '())
+         ((lambda (alist) (update-status alist port))))))
+
 (define (main args)
   (mkdir-p store lib playlists-dir)
   (touch-files status-file)
@@ -93,7 +119,10 @@
              (port (cdr curstatus)))
         (-> (status-add status 'wishlist (args->song args))
             (update-status port)))
-      (retrieve-missing-titles)))
+      (begin
+        (retrieve-missing-titles)
+        (grant-wishes)
+        (bell))))
 
 ;; Local Variables:
 ;; mode: scheme
