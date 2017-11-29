@@ -114,6 +114,8 @@
   (mkdir-p store lib playlists-dir)
   (touch-files status-file)
   (if (> (length args) 1)
+      ;; TODO: Check if the song given at the cli has already been submitted
+      ;; before (i.e. it's in either wishlist, storage or library).
       (let* ((curstatus (current-status))
              (status (car curstatus))
              (port (cdr curstatus)))
