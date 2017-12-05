@@ -45,8 +45,7 @@
   (-> (status-remove status ls old-song)
       (status-add ls new-song)))
 
-;; TODO: Switch status and port argument order.
-(define (update-status status port)
+(define (update-status port status)
   (seek port 0 SEEK_SET)
   (truncate-file port)
   (pretty-print status port)
@@ -70,20 +69,18 @@
        (find (lambda (song) (equal? (assoc-ref song 'url)
                                (assoc-ref ref-song 'url))))))
 
-(define (retrieve-missing-titles)
-  (let* ((curstatus (current-status))
-         (status (car curstatus))
-         (port (cdr curstatus)))
-    (->> (assoc-ref status 'wishlist)
-         (filter (lambda (song) (equal? #f (assoc-ref song 'title))))
-         (map get-title)
-         (map derive-potential-artist-and-track)
-         (fold
-          (lambda (song alist)
-            (status-replace
-             alist 'wishlist
-             (find-same-song (assoc-ref alist 'wishlist) song) song)) status)
-         ((lambda (alist) (update-status alist port))))))
+(define (retrieve-missing-titles status)
+  (->> (assoc-ref status 'wishlist)
+       (filter (lambda (song) (equal? #f (assoc-ref song 'title))))
+       (map get-title)
+       (map derive-potential-artist-and-track)
+       (fold
+        (lambda (song alist)
+          (status-replace
+           alist 'wishlist
+           (find-same-song (assoc-ref alist 'wishlist) song)
+           song))
+        status)))
 
 (define (find-new-dir-from candidate)
   ((lambda (dir)
@@ -100,31 +97,27 @@
      (acons 'storage-location storage-location song))
    (find-new-dir-from 1)))
 
-(define (grant-wishes)
-  (let* ((curstatus (current-status))
-         (status (car curstatus))
-         (port (cdr curstatus)))
-    (->> (assoc-ref status 'wishlist)
-         (map dl)
-         (fold (lambda (song alist) (status-add alist 'available song)) status)
-         (assoc-replace 'wishlist '())
-         ((lambda (alist) (update-status alist port))))))
+(define (grant-wishes status)
+  (->> (assoc-ref status 'wishlist)
+       (map dl)
+       (fold (lambda (song alist) (status-add alist 'available song)) status)
+       (assoc-replace 'wishlist '())))
 
 (define (main args)
   (mkdir-p store lib playlists-dir)
   (touch-files status-file)
-  (if (> (length args) 1)
-      ;; TODO: Check if the song given at the cli has already been submitted
-      ;; before (i.e. it's in either wishlist, storage or library).
-      (let* ((curstatus (current-status))
-             (status (car curstatus))
-             (port (cdr curstatus)))
-        (-> (status-add status 'wishlist (args->song args))
-            (update-status port)))
-      (begin
-        (retrieve-missing-titles)
-        (grant-wishes)
-        (bell))))
+  (let* ((curstatus (current-status))
+         (status (car curstatus))
+         (port (cdr curstatus)))
+    (if (> (length args) 1)
+        ;; TODO: Check if the song given at the cli has already been submitted
+        ;; before (i.e. it's in either wishlist, storage or library).
+        (->> (status-add status 'wishlist (args->song args))
+             (update-status port))
+        (->> (retrieve-missing-titles status)
+             (grant-wishes)
+             (update-status port))))
+  (bell))
 
 ;; Local Variables:
 ;; mode: scheme
