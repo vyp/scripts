@@ -9,8 +9,22 @@
              (pipe))
 
 (define lockfile (home-path "dots/nixos/pkgs/versions.scm"))
+(define temp-clone-dir (home-path "dl/tmp"))
 
-(define (main args))
+(define (dl repo)
+  ((lambda (clone-dir)
+     (system* "git" "clone" (assoc-ref repo 'url) clone-dir)
+     (cons clone-dir (assoc-ref repo 'date)))
+   (find-new-dir-from 1)))
+
+(define (main args)
+  ((lambda (port)
+     ((lambda (repos)
+        (enter-dir temp-clone-dir)
+        (->> (map dl repos)
+             ))
+      (read port)))
+   (open-file lockfile "r+")))
 
 ;; Local Variables:
 ;; mode: scheme
