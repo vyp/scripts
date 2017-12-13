@@ -1,0 +1,17 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i 'guile -e main' -p guile git
+!#
+;; vim: ft=scheme
+
+(use-modules (ice-9 pretty-print)
+             (alist-utils)
+             (io-helpers)
+             (pipe))
+
+(define lockfile (home-path "dots/nixos/pkgs/versions.scm"))
+
+(define (main args))
+
+;; Local Variables:
+;; mode: scheme
+;; End:
