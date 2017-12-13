@@ -25,7 +25,8 @@
         (->> (map dl repos)
            )
         (when (null? (fs-tree* temp-clone-dir))
-              (rmdir temp-clone-dir)))
+              (rmdir temp-clone-dir))
+        (close-port port))
       (read port)))
    (open-file lockfile "r+")))
 
