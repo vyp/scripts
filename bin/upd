@@ -13,16 +13,19 @@
 
 (define (dl repo)
   ((lambda (clone-dir)
+     ;; TODO: Shallow clone if there is a date, i.e. (assoc-ref repo 'date).
      (system* "git" "clone" (assoc-ref repo 'url) clone-dir)
-     (cons clone-dir (assoc-ref repo 'date)))
-   (find-new-dir-from 1)))
+     clone-dir))
+   (find-new-dir-from 1))
 
 (define (main args)
   ((lambda (port)
      ((lambda (repos)
         (enter-dir temp-clone-dir)
         (->> (map dl repos)
-             ))
+           )
+        (when (null? (fs-tree* temp-clone-dir))
+              (rmdir temp-clone-dir)))
       (read port)))
    (open-file lockfile "r+")))
 
