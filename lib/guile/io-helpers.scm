@@ -59,6 +59,13 @@
                              (string-join "\n" 'suffix)) out))))
    (file-string-read file)))
 
+(define-public (find-new-dir-from candidate)
+  ((lambda (dir)
+     (if (file-exists? dir)
+         (find-new-dir-from (+ 1 candidate))
+         dir))
+   (number->string candidate)))
+
 (define-public (port-string-read port)
   ((lambda (ls)
      (do ((line (read-line port) (read-line port)))

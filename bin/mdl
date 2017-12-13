@@ -82,13 +82,6 @@
            song))
         status)))
 
-(define (find-new-dir-from candidate)
-  ((lambda (dir)
-     (if (file-exists? dir)
-         (find-new-dir-from (+ 1 candidate))
-         dir))
-   (number->string candidate)))
-
 (define (dl song)
   (chdir store)
   ((lambda (storage-location)
