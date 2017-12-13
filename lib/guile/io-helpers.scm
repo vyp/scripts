@@ -91,6 +91,12 @@
 (define-public (fs-tree path)
   (remove-stat-from-file-system-tree (file-system-tree path)))
 
+(define-public (fs-tree* path)
+  "Always return fs-tree result in list form."
+  (match (fs-tree path)
+         ((? string?) '())
+         (result (cadr result))))
+
 (define-public (home-path path)
   (string-append (getenv "HOME") "/" path))
 
