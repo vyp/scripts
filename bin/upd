@@ -18,6 +18,16 @@
      clone-dir))
    (find-new-dir-from 1))
 
+(define (version-info repo)
+  (enter-dir repo)
+  (->> (acons 'url
+              (-> (system-output "git remote show origin -n")
+                  (string-split (lambda (c) (char=? c #\newline)))
+                  (cadr)
+                  (string-split char-whitespace?)
+                  (caddr))
+              '())))
+
 (define (main args)
   ((lambda (port)
      ((lambda (repos)
