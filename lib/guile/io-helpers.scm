@@ -18,6 +18,9 @@
          (when (file-exists? file)
            (delete-file file))) files))
 
+(define-public (directory? path)
+  (equal? (stat:type (stat path)) 'directory))
+
 (define (editor)
   ((lambda (e) (if (string-null? e) "nano" e)) (getenv "EDITOR")))
 
@@ -99,6 +102,19 @@
 
 (define-public (home-path path)
   (string-append (getenv "HOME") "/" path))
+
+(define-public (rmdir* path)
+  "Recursively delete a directory."
+  ((lambda (del)
+     (map del (fs-tree* path))
+     (rmdir path))
+   (lambda (fs-obj)
+     (if (string? fs-obj)
+         (let ((fs-obj-path (string-append path "/" fs-obj)))
+           (if (directory? fs-obj-path)
+               (rmdir fs-obj-path)
+               (delete-file fs-obj-path)))
+         (rmdir* (string-append path "/" (car fs-obj)))))))
 
 (define-public (system-output command)
   (let* ((port (open-input-pipe command))
