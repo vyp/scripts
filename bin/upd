@@ -3,7 +3,8 @@
 !#
 ;; vim: ft=scheme
 
-(use-modules (io-helpers)
+(use-modules (srfi srfi-19)
+             (io-helpers)
              (pipe))
 
 (define lockfile (home-path "dots/nixos/pkgs/versions.scm"))
@@ -11,19 +12,49 @@
 
 (define (dl repo)
   ((lambda (clone-location)
-     ;; TODO: Shallow clone if there is a date, i.e. (assoc-ref repo 'date).
-     (system* "git" "clone" (assoc-ref repo 'url) clone-location)
-     clone-location)
+     ((lambda (date)
+        (if date
+            (system* "git" "clone" (string-append "--shallow-since=" date)
+                     (assoc-ref repo 'url) clone-location)
+            (system* "git" "clone" (assoc-ref repo 'url) clone-location))
+        clone-location)
+      (assoc-ref repo 'date)))
    (find-new-dir-from 1)))
+
+(define (get-date rev)
+  (-> (string-append "git show -s --format=%ci " rev)
+      (system-output)
+      (string-split char-whitespace?)
+      (car)))
+
+(define (date-subtract-1d date)
+  ((lambda (date-string-template)
+     (-> (string->date date date-string-template)
+         (date->time-tai)
+         (time-second)
+         ;; There's 86400 seconds in a day.
+         (- 86400)
+         ((lambda (seconds) (make-time 'time-tai 0 seconds)))
+         (time-tai->date)
+         (date->string date-string-template)))
+   "~Y-~m-~d"))
+
+(define (get-date-for-shallow-clone rev)
+  (date-subtract-1d (get-date rev)))
 
 (define (version-info repo-location)
   (enter-dir repo-location)
   ((lambda (url tag commit)
-     (chdir temp-clone-dir)
-     (rmdir* repo-location)
-     (->> (acons 'commit commit '())
-          (acons 'tag (if (string-null? tag) #f tag))
-          (acons 'url url)))
+     ((lambda (date)
+        (chdir temp-clone-dir)
+        (rmdir* repo-location)
+        (->> (acons 'commit commit '())
+             (acons 'date date)
+             (acons 'tag (if (string-null? tag) #f tag))
+             (acons 'url url)))
+      (if (string-null? tag)
+          (get-date-for-shallow-clone commit)
+          (get-date-for-shallow-clone tag))))
    (-> (system-output "git remote show origin -n")
        (string-split (lambda (c) (char=? c #\newline)))
        (cadr)
