@@ -2,6 +2,7 @@
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 match)
   #:use-module (ice-9 popen)
+  #:use-module (ice-9 pretty-print)
   #:use-module (ice-9 rdelim)
   #:use-module (rnrs sorting)
   #:use-module (srfi srfi-1)
@@ -130,3 +131,9 @@
                             (display "" port)
                             (close-port port))
                           (open-file file "w")))) files))
+
+(define-public (update port data)
+  (seek port 0 SEEK_SET)
+  (truncate-file port)
+  (pretty-print data port)
+  (close-port port))
