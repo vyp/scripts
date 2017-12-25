@@ -42,6 +42,8 @@
         (->> (map dl repos)
              (map version-info)
              (update port))
+        ;; temp-clone-dir could have already existed with contents, which we do
+        ;; not check for, therefore only delete it if it is empty now.
         (when (null? (fs-tree* temp-clone-dir))
               (rmdir temp-clone-dir)))
       (read port)))
