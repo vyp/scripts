@@ -10,17 +10,17 @@
 (define temp-clone-dir (home-path "dl/tmp"))
 
 (define (dl repo)
-  ((lambda (clone-dir)
+  ((lambda (clone-location)
      ;; TODO: Shallow clone if there is a date, i.e. (assoc-ref repo 'date).
-     (system* "git" "clone" (assoc-ref repo 'url) clone-dir)
-     clone-dir)
+     (system* "git" "clone" (assoc-ref repo 'url) clone-location)
+     clone-location)
    (find-new-dir-from 1)))
 
-(define (version-info repo)
-  (enter-dir repo)
+(define (version-info repo-location)
+  (enter-dir repo-location)
   ((lambda (url tag commit)
      (chdir temp-clone-dir)
-     (rmdir* repo)
+     (rmdir* repo-location)
      (->> (acons 'commit commit '())
           (acons 'tag (if (string-null? tag) #f tag))
           (acons 'url url)))
