@@ -45,12 +45,6 @@
   (-> (status-remove status ls old-song)
       (status-add ls new-song)))
 
-(define (update-status port status)
-  (seek port 0 SEEK_SET)
-  (truncate-file port)
-  (pretty-print status port)
-  (close-port port))
-
 (define (get-title song)
   (-> (string-append "youtube-dl --get-title '" (assoc-ref song 'url) "'")
       (system-output)
@@ -106,10 +100,10 @@
         ;; TODO: Check if the song given at the cli has already been submitted
         ;; before (i.e. it's in either wishlist, storage or library).
         (->> (status-add status 'wishlist (args->song args))
-             (update-status port))
+             (update port))
         (->> (retrieve-missing-titles status)
              (grant-wishes)
-             (update-status port))))
+             (update port))))
   (bell))
 
 ;; Local Variables:
