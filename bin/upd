@@ -11,15 +11,16 @@
 (define temp-clone-dir (home-path "dl/tmp"))
 
 (define (dl repo)
-  ((lambda (clone-location)
-     ((lambda (date)
-        (if date
-            (system* "git" "clone" (string-append "--shallow-since=" date)
-                     (assoc-ref repo 'url) clone-location)
-            (system* "git" "clone" (assoc-ref repo 'url) clone-location))
-        clone-location)
-      (assoc-ref repo 'date)))
-   (find-new-dir-from 1)))
+  ((lambda (clone-location date url)
+     (if date
+         (system* "git" "clone"
+                  (string-append "--shallow-since=" date)
+                  url clone-location)
+         (system* "git" "clone" url clone-location))
+     clone-location)
+   (find-new-dir-from 1)
+   (assoc-ref repo 'date)
+   (assoc-ref repo 'url)))
 
 (define (get-date rev)
   (-> (string-append "git show -s --format=%ci " rev "^")
