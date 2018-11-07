@@ -40,9 +40,6 @@
          (date->string date-string-template)))
    "~Y-~m-~d"))
 
-(define (get-date-for-shallow-clone rev)
-  (date-subtract-1d (get-date rev)))
-
 (define (version-info repo-location)
   (enter-dir repo-location)
   ((lambda (url tag commit)
@@ -53,9 +50,10 @@
              (acons 'date date)
              (acons 'tag (if (string-null? tag) #f tag))
              (acons 'url url)))
-      (if (string-null? tag)
-          (get-date-for-shallow-clone commit)
-          (get-date-for-shallow-clone tag))))
+      ;; We arbitrarily subtract 1 day from the returned date just to make the
+      ;; shallow clone hopefully always work regardless of timezone difference.
+      (date-subtract-1d
+       (get-date (if (string-null? tag) commit tag)))))
    (-> (system-output "git remote show origin -n")
        (string-split (lambda (c) (char=? c #\newline)))
        (cadr)
