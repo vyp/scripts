@@ -1,5 +1,5 @@
 #! /usr/bin/env nix-shell
-#! nix-shell -i 'guile -e main' -p guile git
+#! nix-shell -i "guile -e main" -p guile git
 !#
 ;; vim: ft=scheme
 
