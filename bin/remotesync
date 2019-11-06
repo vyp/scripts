@@ -1,0 +1,22 @@
+#! /bin/sh
+#|
+exec racket -um "$0" ${1+"$@"}
+|#
+#lang typed/racket
+
+(provide main)
+
+(require threading)
+
+(: lockfile Path)
+(define lockfile
+  (expand-user-path (string->path "~/dots/versions.rkt")))
+
+(: main (-> String * Void))
+(define (main . args)
+  (~>> args
+       (printf "~s\n")))
+
+;; Local Variables:
+;; mode: racket
+;; End:
