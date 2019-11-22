@@ -1,40 +1,14 @@
 #! /bin/sh
-#|
-exec racket -um "$0" ${1+"$@"}
-|#
-#lang typed/racket
+{- 2> /dev/null
+exec runhaskell $0 $0 $@
+-}
+import System.Environment
 
-(provide main)
+main :: IO ()
+main = do
+  args <- getArgs
+  mapM_ putStrLn args
 
-(require racket/path)
-;; raco pkg install threading
-(require threading)
-(require typed/net/url)
-
-(struct clone
-  ([path : Path]
-   [remote : String]
-   [remote-location : URL]
-   [remote-branch : String]
-   [local-branch : String])
-  #:transparent)
-
-(: lockfile Path)
-(define lockfile
-  (expand-user-path (string->path "~/dots/versions.rkt")))
-
-(: parse-lockfile-value (-> Any (Listof clone)))
-(define (parse-lockfile-value v)
-  (if (list? v)
-      (filter clone? v)
-      (error "Invalid lockfile, not a list.")))
-
-(: main (-> String * Void))
-(define (main . args)
-  (if (null? args)
-      (pretty-print "update clones")
-      (pretty-print "add a clone")))
-
-;; Local Variables:
-;; mode: racket
-;; End:
+-- Local Variables:
+-- mode: haskell
+-- End:
